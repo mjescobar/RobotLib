@@ -2,7 +2,7 @@ CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONN
 LDFLAGS = -lpthread
 
 OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
-EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/Dummy.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./robotSimulator/objects/RobotSimulator.o ./robotCM700/objects/cm700.o ./robotCM700/objects/serial.o ./robotCM700/objects/dynamixel.o ./robotCM700/objects/dxl_hal.o
+EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./robotSimulator/objects/RobotSimulator.o ./robotCM700/objects/cm700.o ./robotCM700/objects/serial.o ./robotCM700/objects/dynamixel.o ./robotCM700/objects/dxl_hal.o
 
 OS = $(shell uname -s)
 ECHO = @
