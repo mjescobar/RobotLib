@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -fPIC -I../remoteApi -I../include -I./src -I./headers -I./obje
 EXTFLAGS = -I../robotSimulator/headers -I../robotCM700/headers
 LDFLAGS = -lpthread
 
-all: Object.o Joint.o Dummy.o CollisionObject.o 
+all: Object.o Joint.o CollisionObject.o 
 
 Object.o: Object.cpp 
 	@mkdir -p objects 
@@ -15,11 +15,6 @@ Joint.o: Joint.cpp
 	@mkdir -p objects 
 	@echo "Compiling Joint.cpp to Joint.o"
 	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/Joint.cpp -o ./objects/Joint.o
-
-Dummy.o: Dummy.cpp 
-	@mkdir -p objects 
-	@echo "Compiling Dummy.cpp to Dummy.o"
-	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/Dummy.cpp -o ./objects/Dummy.o
 
 CollisionObject.o: CollisionObject.cpp 
 	@mkdir -p objects 

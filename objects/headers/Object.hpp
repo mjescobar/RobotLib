@@ -25,18 +25,30 @@ namespace ANN_USM
 	protected:
 		// Name of a object, needed for use an virtual or real environment workspace.
 		char * name;
-		// Object of class RobotSimulator used to interact with VREP simulator.
-		RobotSimulator * simulator;
+
+		// Identificator corresponding to a dynamixel real motor
+		int id;	
+
 		// Identificator corresponding to an object in VREP simulator.
 		int handle;
+
 		// Variable used for contain the position of the object in VREP environment in cordenates x, y and z.
 		double * position;
+
 		// Variable used for contain the orientation of the object in VREP environment in alpha, beta and gamma.
 		double * orientation;
+
+		// pointer to 3 values receiving the linearVelocity (vx, vy, vz).
+		double * lVelocity;
+
+		// pointer to 3 values receiving the angularVelocity (dAlpha, dBeta, dGamma).
+		double * aVelocity;
+
+		// Object of class RobotSimulator used to interact with VREP simulator.
+		RobotSimulator * simulator;
+
 		//Object of class cm700 used to interact with real robots.
-		CM700 * cm700;
-		// Identificator corresponding to a dynamixel real motor
-		int id;		
+		CM700 * cm700;		
 
 	public:
 
@@ -105,6 +117,21 @@ namespace ANN_USM
 		 * \param operationMode The remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls).
 		 */		
 		void getOrientation(int relativeTo, double orientation[3], simxInt operationMode);
+
+		/**
+		 * \brief Retrieves the linear velocity of an object.
+		 * \param lVel Array of 3 values receiving the linearVelocity (vx, vy, vz). Can be NULL.
+		 * \param aVel Array of 3 values receiving the angularVelocity (dAlpha, dBeta, dGamma). Can be NULL.
+		 */
+		void getVelocity(double lVel[3], double aVel[3]);
+
+		/**
+		 * \brief Retrieves the linear velocity of an object.
+		 * \param lVel Array of 3 values receiving the linearVelocity (vx, vy, vz). Can be NULL.
+		 * \param aVel Array of 3 values receiving the angularVelocity (dAlpha, dBeta, dGamma). Can be NULL.
+		 * \param operationMode The remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls).
+		 */
+		void getVelocity(double lVel[3], double aVel[3], simxInt operationMode);
 	};
 }
 

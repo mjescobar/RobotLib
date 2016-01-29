@@ -15,10 +15,13 @@ Object::Object(RobotSimulator * simulator, char name[])
 
 	position = new double[3];
 	orientation = new double[3];
+	lVelocity = new double[3];
+	aVelocity = new double[3];
 
 	simulator->simGetObjectHandle(this->name, &handle, simx_opmode_oneshot_wait);
 	getPosition(-1,NULL,simx_opmode_streaming);
 	getOrientation(-1,NULL,simx_opmode_streaming);
+	getVelocity(NULL,NULL,simx_opmode_streaming);
 }
 
 Object::Object(CM700 * cm700, char name[], int id)
@@ -43,7 +46,13 @@ Object::Object()
 
 Object::~Object()
 {
-
+	delete name;
+	delete position;
+	delete orientation;
+	delete lVelocity;
+	delete aVelocity;
+	if (simulator != NULL)	delete simulator;
+	else if (cm700 != NULL) delete cm700;
 }
 
 int Object::getHandle()
@@ -94,6 +103,34 @@ void Object::getOrientation(int relativeTo, double orientation[3], simxInt opera
 	if (orientation != NULL)
 		for (int i = 0; i < 3; i++)
 			orientation[i] = this->orientation[i];
+}
+
+void Object::getVelocity(double lVel[3], double aVel[3])
+{
+	if(simulator != NULL) simulator->simGetObjectVelocity(handle, lVelocity, aVelocity, simx_opmode_buffer);
+	else clog << "ERROR: Function 'Object::getVelocity(double lVel[3])' not implemented in other enviroment" << endl;
+	
+	if (lVel != NULL)
+		for (int i = 0; i < 3; i++)
+			lVel[i] = lVelocity[i];	
+
+	if (aVel != NULL)
+		for (int i = 0; i < 3; i++)
+			aVel[i] = aVelocity[i];		
+}
+
+void Object::getVelocity(double lVel[3], double aVel[3], simxInt operationMode)
+{
+	if(simulator != NULL) simulator->simGetObjectVelocity(handle, lVelocity, aVelocity, operationMode);
+	else clog << "ERROR: Function 'Object::getVelocity(double lVel[3])' not implemented in other enviroment" << endl;
+	
+	if (lVel != NULL)
+		for (int i = 0; i < 3; i++)
+			lVel[i] = lVelocity[i];	
+
+	if (aVel != NULL)
+		for (int i = 0; i < 3; i++)
+			aVel[i] = aVelocity[i];		
 }
 
 #endif
