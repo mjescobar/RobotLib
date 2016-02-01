@@ -1,32 +1,32 @@
-#ifndef ROBOTSIMULATOR_CPP
-#define ROBOTSIMULATOR_CPP
+#ifndef ROBOTVREP_CPP
+#define ROBOTVREP_CPP
 
-#include "RobotSimulator.hpp"
+#include "RobotVREP.hpp"
 
 using namespace ANN_USM;
 
-RobotSimulator::RobotSimulator()
+RobotVREP::RobotVREP()
 {
 	vrep_error.open("error_files/vrep_error.txt");
 }
 
-RobotSimulator::~RobotSimulator()
+RobotVREP::~RobotVREP()
 {
 	vrep_error.close();
 }
 
-void RobotSimulator::simStart()
+void RobotVREP::simStart()
 {
 	clientID = simxStart((simxChar*)"127.0.0.1",PORTNB,true,true,2000,5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
-	else 
+	else
 	{
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
 }
 
-void RobotSimulator::simStart(const char * ip)
+void RobotVREP::simStart(const char * ip)
 {
 	clientID = simxStart((simxChar*)ip, PORTNB, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -37,7 +37,7 @@ void RobotSimulator::simStart(const char * ip)
 	}
 }
 
-void RobotSimulator::simStart(const char * ip, int port)
+void RobotVREP::simStart(const char * ip, int port)
 {
 	clientID = simxStart((simxChar*)ip, port, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -48,7 +48,7 @@ void RobotSimulator::simStart(const char * ip, int port)
 	}
 }
 
-void RobotSimulator::simStart(int port)
+void RobotVREP::simStart(int port)
 {
 	clientID = simxStart((simxChar*)"127.0.0.1", port, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -59,22 +59,22 @@ void RobotSimulator::simStart(int port)
 	}
 }
 
-void RobotSimulator::simFinish()
+void RobotVREP::simFinish()
 {	
 	simxFinish(clientID);
 }
 
-int RobotSimulator::simGetConnectionId()
+int RobotVREP::simGetConnectionId()
 {
 	return simxGetConnectionId(clientID);
 }
 
-void RobotSimulator::simPauseCommunication(int action)
+void RobotVREP::simPauseCommunication(int action)
 {
 	simxPauseCommunication(clientID, action);
 }
 
-void RobotSimulator::simStartSimulation(simxInt operationMode)
+void RobotVREP::simStartSimulation(simxInt operationMode)
 {
 	int error = simxStartSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << " try 1 simxStartSimulation : " << error << endl;
@@ -87,7 +87,7 @@ void RobotSimulator::simStartSimulation(simxInt operationMode)
 	usleep(100000);
 }
 
-void RobotSimulator::simStopSimulation(simxInt operationMode)
+void RobotVREP::simStopSimulation(simxInt operationMode)
 {
 	int error = simxStopSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << "simxStopSimulation : " << error << endl;
@@ -95,13 +95,13 @@ void RobotSimulator::simStopSimulation(simxInt operationMode)
 	usleep(100000);
 }
 
-void RobotSimulator::simGetObjectHandle(char name[], int * handle, simxInt operationMode)
+void RobotVREP::simGetObjectHandle(char name[], int * handle, simxInt operationMode)
 {
 	int error = simxGetObjectHandle(clientID, name, handle, operationMode);	
 	if(error != 0) vrep_error << "simxGetObjectHandle - " << name << " : "<< error << endl;
 }
 
-void RobotSimulator::simGetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
+void RobotVREP::simGetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -112,7 +112,7 @@ void RobotSimulator::simGetObjectPosition(int object_handle, int relativeTo, dou
 		position[i] = (double)aux[i];
 }
 
-void RobotSimulator::simGetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
+void RobotVREP::simGetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
 {
 	float * lVel = new float[3];
 	float * aVel = new float[3];
@@ -134,7 +134,7 @@ void RobotSimulator::simGetObjectVelocity(int object_handle, double * lVelocity,
 	}	
 }
 
-void RobotSimulator::simGetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
+void RobotVREP::simGetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -145,7 +145,7 @@ void RobotSimulator::simGetObjectOrientation(int object_handle, int relativeTo, 
 		orientation[i] = (double)aux[i];
 }
 
-double RobotSimulator::simGetJointPosition(int object_handle, simxInt operationMode)
+double RobotVREP::simGetJointPosition(int object_handle, simxInt operationMode)
 {
 	float joint_pos;
 
@@ -155,13 +155,13 @@ double RobotSimulator::simGetJointPosition(int object_handle, simxInt operationM
 	return (double)joint_pos;
 }
 
-void RobotSimulator::simSetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
+void RobotVREP::simSetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
 {
 	int error = simxSetJointTargetPosition(clientID, object_handle, (float)joint_pos, operationMode);
 	if(error != 0) vrep_error << "simxSetJointTargetPosition - " << object_handle << " : "<< error << endl;	
 }
 
-double RobotSimulator::simGetJointForce(int object_handle, simxInt operationMode)
+double RobotVREP::simGetJointForce(int object_handle, simxInt operationMode)
 {
 	float force;
 
@@ -171,13 +171,13 @@ double RobotSimulator::simGetJointForce(int object_handle, simxInt operationMode
 	return (double)force;
 }
 
-void RobotSimulator::simAddStatusbarMessage(char * message, simxInt operationMode)
+void RobotVREP::simAddStatusbarMessage(char * message, simxInt operationMode)
 {
 	int error = simxAddStatusbarMessage(clientID,(char*)message, operationMode);	
 	if(error != 0) vrep_error << "simxAddStatusbarMessage - " << message << " : " << error << endl;
 } 
 
-void RobotSimulator::simReadCollision(int collisionHandle, int * collisionState, simxInt operationMode)
+void RobotVREP::simReadCollision(int collisionHandle, int * collisionState, simxInt operationMode)
 {
 	unsigned char * aux = (unsigned char*)malloc(sizeof(unsigned char)*100);
 	int error = simxReadCollision(clientID, collisionHandle, aux, operationMode);
@@ -186,7 +186,7 @@ void RobotSimulator::simReadCollision(int collisionHandle, int * collisionState,
 	free(aux);
 }
 
-void RobotSimulator::simGetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
+void RobotVREP::simGetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
 {
 	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
 	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;

@@ -1,5 +1,5 @@
-#ifndef ROBOTSIMULATOR_HPP
-#define ROBOTSIMULATOR_HPP
+#ifndef ROBOTVREP_HPP
+#define ROBOTVREP_HPP
 
 #include <stdlib.h>
 #include <iostream>
@@ -21,10 +21,10 @@ extern "C" {
 namespace ANN_USM
 {
 	/**
-	 * \class RobotSimulator
-	 * \brief The RobotSimulator class is used to interact with an virtual environment of simulation named VREP more easily and transparently for the user.
+	 * \class RobotVREP
+	 * \brief The RobotVREP class is used to interact with an virtual environment of simulation named VREP more easily and transparently for the user.
 	 */
-	class RobotSimulator
+	class RobotVREP
 	{
 		// Id used for VREP to identify the socket user.
 		int clientID;
@@ -35,12 +35,12 @@ namespace ANN_USM
 		/**
 		 * \brief Void constructor.
 		 */
-		RobotSimulator();
+		RobotVREP();
 
 		/**
 		 * \brief Destructor.
 		 */
-		~RobotSimulator();
+		~RobotVREP();
 
 		/**
 		 * \brief Starts a communication thread with VREP through default ip address.
