@@ -4,7 +4,7 @@
 #include "CollisionObject.hpp"
 using namespace ANN_USM;
 
-CollisionObject::CollisionObject(RobotSimulator * simulator, char name[])
+CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
 {
 	this->simulator = NULL;
 	this->simulator = simulator;

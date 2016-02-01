@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "RobotSimulator.hpp"
+#include "RobotVREP.hpp"
 #include "cm700.h"
 
 using namespace std;
@@ -44,8 +44,8 @@ namespace ANN_USM
 		// pointer to 3 values receiving the angularVelocity (dAlpha, dBeta, dGamma).
 		double * aVelocity;
 
-		// Object of class RobotSimulator used to interact with VREP simulator.
-		RobotSimulator * simulator;
+		// Object of class RobotVREP used to interact with VREP simulator.
+		RobotVREP * simulator;
 
 		//Object of class cm700 used to interact with real robots.
 		CM700 * cm700;		
@@ -57,7 +57,7 @@ namespace ANN_USM
 		 * \param simulator Object of class simulator used for interact with VREP.
 		 * \param name Name of the object in VREP.
 		 */
-		Object(RobotSimulator * simulator, char name[]);
+		Object(RobotVREP * simulator, char name[]);
 
 		/**
 		 * \brief Constructor with parameters.

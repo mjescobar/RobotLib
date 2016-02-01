@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "RobotSimulator.hpp"
+#include "RobotVREP.hpp"
 
 using namespace std;
 
@@ -21,8 +21,8 @@ namespace ANN_USM
 	 */
 	class CollisionObject
 	{
-		// Object of class RobotSimulator used to interact with VREP simulator.
-		RobotSimulator * simulator;
+		// Object of class RobotVREP used to interact with VREP simulator.
+		RobotVREP * simulator;
 		// Name of a object, needed for use an virtual or real environment workspace.
 		char * name;
 		// Collision state of the object. if exist collision its value will be 1, otherwise it will be 0.
@@ -36,7 +36,7 @@ namespace ANN_USM
 		 * \param simulator Object of class simulator used for interact with VREP.
 		 * \param name Name of the motor.
 		 */
-		CollisionObject(RobotSimulator * simulator, char name[]);
+		CollisionObject(RobotVREP * simulator, char name[]);
 		/**
 		 * \brief Void constructor
 		 */

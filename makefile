@@ -2,7 +2,7 @@ CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONN
 LDFLAGS = -lpthread
 
 OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
-EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./robotSimulator/objects/RobotSimulator.o ./robotCM700/objects/cm700.o ./robotCM700/objects/serial.o ./robotCM700/objects/dynamixel.o ./robotCM700/objects/dxl_hal.o
+EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./RobotVREP/objects/RobotVREP.o ./robotCM700/objects/cm700.o ./robotCM700/objects/serial.o ./robotCM700/objects/dynamixel.o ./robotCM700/objects/dxl_hal.o
 
 OS = $(shell uname -s)
 ECHO = @
@@ -14,8 +14,8 @@ else
 endif
 
 all: $(OBJS)
-	@echo "Compiling RobotSimulator"
-	@cd ./robotSimulator; make
+	@echo "Compiling RobotVREP"
+	@cd ./RobotVREP; make
 	@echo "Compiling robotCM700"
 	@cd ./robotCM700; make
 	@echo "Compiling Objects"
@@ -32,7 +32,7 @@ all: $(OBJS)
 
 clean:
 		@rm -f $(OBJS)
-		@cd ./robotSimulator; make clean		
+		@cd ./RobotVREP; make clean		
 		@cd ./robotCM700; make clean
 		@cd ./objects; make clean
 		@cd ./example; make clean
@@ -50,7 +50,7 @@ install:
 	@cp ./remoteApi/*.h /usr/include/ROBOTLIB_headers/
 	@cp ./objects/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ./robotCM700/headers/* /usr/include/ROBOTLIB_headers/
-	@cp ./robotSimulator/headers/* /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ROBOTLIB /usr/include
 	@chmod go+r /usr/include/ROBOTLIB_headers/*
 	@chmod go+r /usr/include/ROBOTLIB

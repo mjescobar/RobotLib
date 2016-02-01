@@ -4,7 +4,7 @@
 #include "Object.hpp"
 using namespace ANN_USM;
 
-Object::Object(RobotSimulator * simulator, char name[])
+Object::Object(RobotVREP * simulator, char name[])
 {
 	this->simulator = simulator;
 	this->cm700 = NULL;

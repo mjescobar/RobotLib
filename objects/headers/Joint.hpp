@@ -101,7 +101,7 @@ namespace ANN_USM
 		 * \param unit Unit used in the user workspace.
 		 * \param position Initial position asigned to the motor.
 		 */
-		Joint(RobotSimulator * simulator, char name[], double max_value, double min_value, const char * unit, double position);
+		Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit, double position);
 
 		/**
 		 * \brief Constructor with parameters.
@@ -111,7 +111,7 @@ namespace ANN_USM
 		 * \param min_value Minimum value of the motor position.
 		 * \param unit Unit used in the user workspace.
 		 */
-		Joint(RobotSimulator * simulator, char name[], double max_value, double min_value, const char * unit);
+		Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit);
 
 		/**
 		 * \brief Constructor with parameters.

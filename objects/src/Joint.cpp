@@ -53,7 +53,7 @@ double Joint::Filter(double value)
 
 }
 
-Joint::Joint(RobotSimulator * simulator, char name[], double max_value, double min_value, const char * unit, double position)  : Object(simulator, name)
+Joint::Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit, double position)  : Object(simulator, name)
 {
 	this->max_value = max_value;
 	this->min_value = min_value;
@@ -91,7 +91,7 @@ Joint::Joint(RobotSimulator * simulator, char name[], double max_value, double m
 
 }
 
-Joint::Joint(RobotSimulator * simulator, char name[], double max_value, double min_value, const char * unit) : Object(simulator, name)
+Joint::Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit) : Object(simulator, name)
 {
 	this->max_value = max_value;
 	this->min_value = min_value;
