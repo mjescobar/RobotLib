@@ -22,7 +22,6 @@ CM700::CM700(string serialPort, int baudNum = 1)
 	{
 		cout << "USB2Dynamixel inicializado!" << endl;
 	}
-
 }
 
 CM700::~CM700( ) 
@@ -34,7 +33,7 @@ CM700::~CM700( )
 void CM700::addMotor(int id)
 {
 	//Verifing that the id is unique
-	if( idToMotorsVectorPosition.find( id ) == idToMotorsVectorPosition.end() )
+	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
 		std::cerr << "ERROR::CM700::addMotor::The id already exist" << std::endl;
@@ -60,7 +59,7 @@ void CM700::addMotor(int id)
 
 	// Adding the motor
 	motors.push_back( motor );
-	idToMotorsVectorPosition.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
+	idToMotorsVectorPosition_map.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
 }
 
 
@@ -69,7 +68,7 @@ void CM700::addMotor(int id)
 void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg)
 {
 	//Verifing that the id is unique
-	if( idToMotorsVectorPosition.find( id ) == idToMotorsVectorPosition.end() )
+	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
 		std::cerr << "ERROR::CM700::addMotor::The id already exist" << std::endl;
@@ -98,21 +97,21 @@ void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int vel
 
 	// Adding the motor
 	motors.push_back( motor );
-	idToMotorsVectorPosition.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
+	idToMotorsVectorPosition_map.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
 }
 
 
 
 void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity)
 {
-	if( idToMotorsVectorPosition.find( id ) == idToMotorsVectorPosition.end() )
+	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
 		std::cerr << "ERROR::CM700::setMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
 		exit (EXIT_FAILURE);
 	}
 
-	int motorVectorPosition = idToMotorsVectorPosition.at( id );
+	int motorVectorPosition = idToMotorsVectorPosition_map.at( id );
 
 	// if angle_RAD is no in 0-2Pi then is important to convert that.
 	while(angle_RAD >= M_PI || angle_RAD <= -M_PI)
@@ -150,17 +149,27 @@ void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity
 	int speed = (int)( normalizedVelocity * motors.at(motorVectorPosition).velocityResolution);
 	motors.at( motorVectorPosition ).tposition = goalPosition;
 	motors.at( motorVectorPosition ).tspeed = speed;
+
+
+	// Now it is placed within a vector of motor that will be moved in le next move() call.
+	// take in account that if is in that vector then is no necesary put it aggain
+	std::vector<int>::iterator it;
+	it = find (idMotorsWithNewPosition_Vect.begin(), idMotorsWithNewPosition_Vect.end(), id);
+	if (it == myvector.end())
+	{
+		idMotorsWithNewPosition_Vect.push_back( id ); // Only if is not in the vector this line occur
+	}
 }
 
 int CM700::getMotorPosition(int id)
 {
-	if( idToMotorsVectorPosition.find( id ) == idToMotorsVectorPosition.end() )
+	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
 		std::cerr << "ERROR::CM700::getMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
 		exit (EXIT_FAILURE);
 	}
-	auto motorVectorPosition = idToMotorsVectorPosition.at( id );
+	auto motorVectorPosition = idToMotorsVectorPosition_map.at( id );
 	return motors.at(motorVectorPosition).cposition;
 } 
 
@@ -207,23 +216,26 @@ void CM700::refreshAll()
 	}
 }
 
-void CM700::moveAll()
+void CM700::move()
 {
 	int param_per_actuator = 4;
 	
 
-	dxl_set_txpacket_id( BROADCAST_ID);
-	dxl_set_txpacket_length( (param_per_actuator + 1) * ((int)motors.size()) + 4);
+	dxl_set_txpacket_id( BROADCAST_ID );
+	dxl_set_txpacket_length( (param_per_actuator + 1) * ((int)idMotorsWithNewPosition_Vect.size()) + 4);
 	dxl_set_txpacket_instruction( INST_SYNC_WRITE );
 	dxl_set_txpacket_parameter( 0, P_GOAL_POSITION_L );
 	dxl_set_txpacket_parameter( 1, param_per_actuator );
 
-	for (unsigned int i = 0; i < motors.size(); i++) {
+	for (unsigned int i = 0; i < idMotorsWithNewPosition_Vect.size(); i++) 
+	{
+		int id = idMotorsWithNewPosition_Vect.at(i);
+		int idPositionInMotors = idToMotorsVectorPosition_map.at(id);
 		dxl_set_txpacket_parameter(2 + 5 * i, motors.at(i).id);
-		dxl_set_txpacket_parameter(2 + 5 * i + 1, _L16(motors.at(i).tposition));
-		dxl_set_txpacket_parameter(2 + 5 * i + 2, _H16(motors.at(i).tposition));
-		dxl_set_txpacket_parameter(2 + 5 * i + 3, _L16(motors.at(i).tspeed));
-		dxl_set_txpacket_parameter(2 + 5 * i + 4, _H16(motors.at(i).tspeed));
+		dxl_set_txpacket_parameter(2 + 5 * i + 1, _L16(motors.at(idPositionInMotors ).tposition));
+		dxl_set_txpacket_parameter(2 + 5 * i + 2, _H16(motors.at(idPositionInMotors ).tposition));
+		dxl_set_txpacket_parameter(2 + 5 * i + 3, _L16(motors.at(idPositionInMotors ).tspeed));
+		dxl_set_txpacket_parameter(2 + 5 * i + 4, _H16(motors.at(idPositionInMotors ).tspeed));
 	}
 
 	dxl_tx_packet();
@@ -243,40 +255,6 @@ void CM700::moveAll()
 		}
 	}
 }
-
-// void CM700::setTorque(bool enable)
-// {
-// 	int value = 0;
-// 	if (enable == true) {
-// 		this->moveAll();
-// 		value = 1;
-// 	} else {
-// 		value = 0;
-// 	}
-
-// #ifdef USE_USB2DXL
-// 	dxl_set_txpacket_id(BROADCAST_ID);
-// 	dxl_set_txpacket_length(2 * num_actuadores + 4);
-// 	dxl_set_txpacket_instruction(INST_SYNC_WRITE);
-// 	dxl_set_txpacket_parameter(0, P_TORQUE_ENABLE);
-// 	dxl_set_txpacket_parameter(1, 1);
-
-// 	for (int i = 0; i < num_actuadores; i++) {
-// 		dxl_set_txpacket_parameter(2 + 2 * i, actuadores[i].id);
-// 		dxl_set_txpacket_parameter(3 + 2 * i, value);
-// 	}
-
-// 	dxl_txrx_packet();
-// #else
-// 	buffer_out[0] = 0xFF;
-// 	buffer_out[1] = SETTORQUE;
-// 	buffer_out[2] = num_actuadores;
-// 	buffer_out[3] = value;
-
-// 	serial_io_flush(fd);
-// 	serial_send(fd, buffer_out, 4);
-// #endif
-// }
 
 
 void CM700::printValues() {

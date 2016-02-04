@@ -85,7 +85,8 @@ class CM700
 	char buffer_out [ 255 ];
 	string serialPort;
 	std::vector <Motor> motors;
-	std::map <int , int  > idToMotorsVectorPosition;
+	std::map <int , int  > idToMotorsVectorPosition_map;
+	std::vector < int > idMotorsWithNewPosition_Vect;
 
 public:	
 	CM700 (string serialPort, int baudNum);
@@ -94,7 +95,7 @@ public:
 	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
 	int getMotorPosition(int id);
 	void refreshAll();
-	void moveAll();
+	void move();
 	void setTorque(bool enable);
 	void printValues();
 	bool verifyModel(int model);
