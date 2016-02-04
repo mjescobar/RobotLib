@@ -8,10 +8,12 @@
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
-
+#include <string>
+#include <vector>
+#include <map>
 #include "serial.h"
 #include "dynamixel.h"
-
+#include <cmath>
 #include <iostream>
 
 /* MEMADDR */
@@ -31,10 +33,11 @@
 #define P_PRESENT_LOAD_H        41
 #define P_PRESENT_VOLTAGE       42
 #define P_PRESENT_TEMPERATURE   43
+#define P_CURRENT_LOW			(68)
 
 #define TAMANO_BUFFER_COMUNICACION 10000
 #define USE_USB2DXL
-#define PUERTO_SERIAL "/dev/ttyUSB0"
+
 #define DEF_TIMEOUT		100000
 #define SETPOSNDVEL		0x02
 #define ASKPOSNDVEL		0x04
@@ -50,51 +53,52 @@
 #define _H16(x)			((x >> 8) & 0xFF)
 #define _MW(x, y)		(y * 256 + x)
 
+enum Models 
+{
+	AX12 = 12,
+	MX64 = 54
+};
 
 using namespace std;
 
-struct actuador {
+struct Motor 
+{
 	int id;
-
 	int cposition;
 	int tposition;
-
 	int cspeed;
 	int tspeed;
-
 	int load;
-
 	int volt;
 	int current;
 	int temperature;
+	int angleResolution;
+	bool hasCurrentSensor;
+	int velocityResolution;
+	double angleRangeDeg; // in case that the dynamixel motor have not 360 deg of range like ax12 that have only 300 deg of range.s
 };
 
-class CM700 {
+class CM700 
+{
 	int fd;
-	char *serial_name;
+	uint8_t buffer_in [ 255 ];
+	char buffer_out [ 255 ];
+	string serialPort;
+	std::vector <Motor> motors;
+	std::map <int , int  > idToMotorsVectorPosition;
 
-	uint8_t buffer_in[255];
-	char buffer_out[255];
-
-	int num_actuadores;
-	int actuadores_leg;
-
-	struct actuador *actuadores;
-	struct actuador servocam;
-	time_t timestamp;
-public:
-	
-	CM700(int, int);
-	~CM700(void);
-
-	void setMotorPosition(int id, int pos, int vel);
+public:	
+	CM700 (string serialPort, int baudNum);
+	~CM700(); 
+	void addMotor(int id);
+	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
 	int getMotorPosition(int id);
 	void refreshAll();
 	void moveAll();
 	void setTorque(bool enable);
 	void printValues();
-	
-	friend class Robot;
-	friend class Leg;
+	bool verifyModel(int model);
+	void setMotorParametersFromModel(int model, Motor &motor);	
+	void setMotorPosition(int id, double angle_RAD, double velocity);
 };
 #endif

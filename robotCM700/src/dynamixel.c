@@ -1,5 +1,6 @@
 #include "dxl_hal.h"
 #include "dynamixel.h"
+#include <stdio.h>
 
 #define ID					(2)
 #define LENGTH				(3)
@@ -16,13 +17,16 @@ int gbCommStatus = COMM_RXSUCCESS;
 int giBusUsing = 0;
 
 
-int dxl_initialize(int deviceIndex, int baudnum )
+int dxl_initialize(const char * serialDeviceName, int baudnum )
 {
 	float baudrate;	
 	baudrate = 2000000.0f / (float)(baudnum + 1);
-
-	if( dxl_hal_open(deviceIndex, baudrate) == 0 )
+	fprintf(stderr,"llego");
+	if( dxl_hal_open(serialDeviceName, baudrate) == 0 )
+	{
 		return 0;
+	}
+	fprintf(stderr,"llego2");
 
 	gbCommStatus = COMM_RXSUCCESS;
 	giBusUsing = 0;
@@ -45,7 +49,7 @@ void dxl_tx_packet(void)
 	
 	giBusUsing = 1;
 
-	if( gbInstructionPacket[LENGTH] > (MAXNUM_TXPARAM+2) )
+	if( gbInstructionPacket [ LENGTH ] > ( MAXNUM_TXPARAM + 2 ) )
 	{
 		gbCommStatus = COMM_TXERROR;
 		giBusUsing = 0;
@@ -67,14 +71,14 @@ void dxl_tx_packet(void)
 	
 	gbInstructionPacket[0] = 0xff;
 	gbInstructionPacket[1] = 0xff;
-	for( i=0; i<(gbInstructionPacket[LENGTH]+1); i++ )
-		checksum += gbInstructionPacket[i+2];
-	gbInstructionPacket[gbInstructionPacket[LENGTH]+3] = ~checksum;
+	for( i=0; i < ( gbInstructionPacket [ LENGTH ] + 1 ); i++ )
+		checksum += gbInstructionPacket [ i + 2 ] ;
+	gbInstructionPacket [ gbInstructionPacket [ LENGTH ] + 3 ] = ~checksum;
 	
 	if( gbCommStatus == COMM_RXTIMEOUT || gbCommStatus == COMM_RXCORRUPT )
 		dxl_hal_clear();
 
-	TxNumByte = gbInstructionPacket[LENGTH] + 4;
+	TxNumByte = gbInstructionPacket[ LENGTH ] + 4;
 	RealTxNumByte = dxl_hal_tx( (unsigned char*)gbInstructionPacket, TxNumByte );
 
 	if( TxNumByte != RealTxNumByte )
@@ -84,8 +88,8 @@ void dxl_tx_packet(void)
 		return;
 	}
 
-	if( gbInstructionPacket[INSTRUCTION] == INST_READ )
-		dxl_hal_set_timeout( gbInstructionPacket[PARAMETER+1] + 6 );
+	if( gbInstructionPacket [ INSTRUCTION ] == INST_READ )
+		dxl_hal_set_timeout( gbInstructionPacket [ PARAMETER + 1 ] + 6 );
 	else
 		dxl_hal_set_timeout( 6 );
 
@@ -219,7 +223,7 @@ void dxl_set_txpacket_instruction( int instruction )
 
 void dxl_set_txpacket_parameter( int index, int value )
 {
-	gbInstructionPacket[PARAMETER+index] = (unsigned char)value;
+	gbInstructionPacket[ PARAMETER + index ] = (unsigned char)value;
 }
 
 void dxl_set_txpacket_length( int length )

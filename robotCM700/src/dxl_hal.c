@@ -9,22 +9,25 @@
 
 #include "dxl_hal.h"
 
-int	gSocket_fd	= -1;
-long	glStartTime	= 0;
+
+
+int		gSocket_fd		= -1;
+long	glStartTime		= 0;
 float	gfRcvWaitTime	= 0.0f;
 float	gfByteTransTime	= 0.0f;
 
-char	gDeviceName[20];
+char	gDeviceName		[ 20 ];
 
-int dxl_hal_open(int deviceIndex, float baudrate)
+int dxl_hal_open(const char * serialDeviceName, float baudrate)
 {
 	struct termios newtio;
 	struct serial_struct serinfo;
 	char dev_name[100] = {0, };
 
-	sprintf(dev_name, "/dev/ttyUSB%d", deviceIndex);
+	sprintf(dev_name, "%s", serialDeviceName);
 
 	strcpy(gDeviceName, dev_name);
+    fprintf(stderr,"DeviceName: %s", gDeviceName);
 	memset(&newtio, 0, sizeof(newtio));
 	dxl_hal_close();
 	
