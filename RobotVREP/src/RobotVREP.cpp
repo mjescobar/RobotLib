@@ -7,16 +7,6 @@ using namespace ANN_USM;
 
 RobotVREP::RobotVREP()
 {
-	vrep_error.open("error_files/vrep_error.txt");
-}
-
-RobotVREP::~RobotVREP()
-{
-	vrep_error.close();
-}
-
-void RobotVREP::simStart()
-{
 	clientID = simxStart((simxChar*)"127.0.0.1",PORTNB,true,true,2000,5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
 	else
@@ -24,9 +14,11 @@ void RobotVREP::simStart()
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
 }
 
-void RobotVREP::simStart(const char * ip)
+RobotVREP::RobotVREP(const char * ip)
 {
 	clientID = simxStart((simxChar*)ip, PORTNB, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -35,20 +27,11 @@ void RobotVREP::simStart(const char * ip)
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
 }
 
-void RobotVREP::simStart(const char * ip, int port)
-{
-	clientID = simxStart((simxChar*)ip, port, true, true, 2000, 5);
-	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
-	else 
-	{
-		clog << "ERROR: The connection to VREP was not possible" << endl;
-		return;
-	}
-}
-
-void RobotVREP::simStart(int port)
+RobotVREP::RobotVREP(int port)
 {
 	clientID = simxStart((simxChar*)"127.0.0.1", port, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -57,25 +40,58 @@ void RobotVREP::simStart(int port)
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
 }
 
-void RobotVREP::simFinish()
-{	
+RobotVREP::RobotVREP(const char * ip, int port)
+{
+	clientID = simxStart((simxChar*)ip, port, true, true, 2000, 5);
+	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
+	else 
+	{
+		clog << "ERROR: The connection to VREP was not possible" << endl;
+		return;
+	}
+
+	vrep_error.open("error_files/vrep_error.txt");
+}
+
+RobotVREP::~RobotVREP()
+{
 	simxFinish(clientID);
+
+	vrep_error.close();
 }
 
-int RobotVREP::simGetConnectionId()
+void RobotVREP::trackConnection()
+{
+	int aux_clientID = simxGetConnectionId(clientID);
+
+	if (aux_clientID == -1)
+	{
+		clog << "ERROR: The client is not connected to VREP. The program ends" << endl;
+		delete this;
+		exit(EXIT_FAILURE);
+	}
+	else if (aux_clientID != clientID)
+		clog << "WARNING: Exist temporary disconections in-between" << endl;
+}
+
+int RobotVREP::GetConnectionId()
 {
 	return simxGetConnectionId(clientID);
 }
 
-void RobotVREP::simPauseCommunication(int action)
+void RobotVREP::PauseCommunication(int action)
 {
 	simxPauseCommunication(clientID, action);
 }
 
-void RobotVREP::simStartSimulation(simxInt operationMode)
+void RobotVREP::StartSimulation(simxInt operationMode)
 {
+	trackConnection();
+
 	int error = simxStartSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << " try 1 simxStartSimulation : " << error << endl;
 	else
@@ -87,7 +103,7 @@ void RobotVREP::simStartSimulation(simxInt operationMode)
 	usleep(100000);
 }
 
-void RobotVREP::simStopSimulation(simxInt operationMode)
+void RobotVREP::StopSimulation(simxInt operationMode)
 {
 	int error = simxStopSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << "simxStopSimulation : " << error << endl;
@@ -95,13 +111,13 @@ void RobotVREP::simStopSimulation(simxInt operationMode)
 	usleep(100000);
 }
 
-void RobotVREP::simGetObjectHandle(char name[], int * handle, simxInt operationMode)
+void RobotVREP::GetObjectHandle(char name[], int * handle, simxInt operationMode)
 {
 	int error = simxGetObjectHandle(clientID, name, handle, operationMode);	
 	if(error != 0) vrep_error << "simxGetObjectHandle - " << name << " : "<< error << endl;
 }
 
-void RobotVREP::simGetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
+void RobotVREP::GetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -112,7 +128,7 @@ void RobotVREP::simGetObjectPosition(int object_handle, int relativeTo, double *
 		position[i] = (double)aux[i];
 }
 
-void RobotVREP::simGetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
+void RobotVREP::GetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
 {
 	float * lVel = new float[3];
 	float * aVel = new float[3];
@@ -134,7 +150,7 @@ void RobotVREP::simGetObjectVelocity(int object_handle, double * lVelocity, doub
 	}	
 }
 
-void RobotVREP::simGetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
+void RobotVREP::GetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -145,7 +161,7 @@ void RobotVREP::simGetObjectOrientation(int object_handle, int relativeTo, doubl
 		orientation[i] = (double)aux[i];
 }
 
-double RobotVREP::simGetJointPosition(int object_handle, simxInt operationMode)
+double RobotVREP::GetJointPosition(int object_handle, simxInt operationMode)
 {
 	float joint_pos;
 
@@ -155,13 +171,13 @@ double RobotVREP::simGetJointPosition(int object_handle, simxInt operationMode)
 	return (double)joint_pos;
 }
 
-void RobotVREP::simSetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
+void RobotVREP::SetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
 {
 	int error = simxSetJointTargetPosition(clientID, object_handle, (float)joint_pos, operationMode);
 	if(error != 0) vrep_error << "simxSetJointTargetPosition - " << object_handle << " : "<< error << endl;	
 }
 
-double RobotVREP::simGetJointForce(int object_handle, simxInt operationMode)
+double RobotVREP::GetJointForce(int object_handle, simxInt operationMode)
 {
 	float force;
 
@@ -171,13 +187,13 @@ double RobotVREP::simGetJointForce(int object_handle, simxInt operationMode)
 	return (double)force;
 }
 
-void RobotVREP::simAddStatusbarMessage(char * message, simxInt operationMode)
+void RobotVREP::AddStatusbarMessage(char * message, simxInt operationMode)
 {
 	int error = simxAddStatusbarMessage(clientID,(char*)message, operationMode);	
 	if(error != 0) vrep_error << "simxAddStatusbarMessage - " << message << " : " << error << endl;
 } 
 
-void RobotVREP::simReadCollision(int collisionHandle, int * collisionState, simxInt operationMode)
+void RobotVREP::ReadCollision(int collisionHandle, int * collisionState, simxInt operationMode)
 {
 	unsigned char * aux = (unsigned char*)malloc(sizeof(unsigned char)*100);
 	int error = simxReadCollision(clientID, collisionHandle, aux, operationMode);
@@ -186,7 +202,7 @@ void RobotVREP::simReadCollision(int collisionHandle, int * collisionState, simx
 	free(aux);
 }
 
-void RobotVREP::simGetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
+void RobotVREP::GetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
 {
 	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
 	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;
