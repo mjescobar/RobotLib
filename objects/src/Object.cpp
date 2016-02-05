@@ -18,7 +18,7 @@ Object::Object(RobotVREP * simulator, char name[])
 	lVelocity = new double[3];
 	aVelocity = new double[3];
 
-	simulator->simGetObjectHandle(this->name, &handle, simx_opmode_oneshot_wait);
+	simulator->getObjectHandle(this->name, &handle, simx_opmode_oneshot_wait);
 	getPosition(-1,NULL,simx_opmode_streaming);
 	getOrientation(-1,NULL,simx_opmode_streaming);
 	getVelocity(NULL,NULL,simx_opmode_streaming);
@@ -67,7 +67,7 @@ char * Object::getName()
 
 void Object::getPosition(int relativeTo, double position[3])
 {
-	if(simulator != NULL) simulator->simGetObjectPosition(handle, relativeTo, this->position, simx_opmode_buffer);
+	if(simulator != NULL) simulator->getObjectPosition(handle, relativeTo, this->position, simx_opmode_buffer);
 	else clog << "ERROR: Function 'Object::getPosition(int relativeTo)' not implemented in other enviroment" << endl;
 
 	if (position != NULL)
@@ -77,7 +77,7 @@ void Object::getPosition(int relativeTo, double position[3])
 
 void Object::getPosition(int relativeTo, double position[3], simxInt operationMode)
 {
-	if(simulator != NULL) simulator->simGetObjectPosition(handle, relativeTo, this->position, operationMode);
+	if(simulator != NULL) simulator->getObjectPosition(handle, relativeTo, this->position, operationMode);
 	else clog << "ERROR: Function 'Object::getPosition(int relativeTo)' not implemented in other enviroment" << endl;
 
 	if (position != NULL)
@@ -87,7 +87,7 @@ void Object::getPosition(int relativeTo, double position[3], simxInt operationMo
 
 void Object::getOrientation(int relativeTo, double orientation[3])
 {
-	if(simulator != NULL) simulator->simGetObjectOrientation(handle, relativeTo, this->orientation, simx_opmode_buffer);
+	if(simulator != NULL) simulator->getObjectOrientation(handle, relativeTo, this->orientation, simx_opmode_buffer);
 	else clog << "ERROR: Function 'Object::getOrientation(int relativeTo)' not implemented in other enviroment" << endl;
 
 	if (orientation != NULL)
@@ -97,7 +97,7 @@ void Object::getOrientation(int relativeTo, double orientation[3])
 
 void Object::getOrientation(int relativeTo, double orientation[3], simxInt operationMode)
 {
-	if(simulator != NULL) simulator->simGetObjectOrientation(handle, relativeTo, this->orientation, operationMode);
+	if(simulator != NULL) simulator->getObjectOrientation(handle, relativeTo, this->orientation, operationMode);
 	else clog << "ERROR: Function 'Object::getOrientation(int relativeTo)' not implemented in other enviroment" << endl;
 
 	if (orientation != NULL)
@@ -107,7 +107,7 @@ void Object::getOrientation(int relativeTo, double orientation[3], simxInt opera
 
 void Object::getVelocity(double lVel[3], double aVel[3])
 {
-	if(simulator != NULL) simulator->simGetObjectVelocity(handle, lVelocity, aVelocity, simx_opmode_buffer);
+	if(simulator != NULL) simulator->getObjectVelocity(handle, lVelocity, aVelocity, simx_opmode_buffer);
 	else clog << "ERROR: Function 'Object::getVelocity(double lVel[3])' not implemented in other enviroment" << endl;
 	
 	if (lVel != NULL)
@@ -121,7 +121,7 @@ void Object::getVelocity(double lVel[3], double aVel[3])
 
 void Object::getVelocity(double lVel[3], double aVel[3], simxInt operationMode)
 {
-	if(simulator != NULL) simulator->simGetObjectVelocity(handle, lVelocity, aVelocity, operationMode);
+	if(simulator != NULL) simulator->getObjectVelocity(handle, lVelocity, aVelocity, operationMode);
 	else clog << "ERROR: Function 'Object::getVelocity(double lVel[3])' not implemented in other enviroment" << endl;
 	
 	if (lVel != NULL)

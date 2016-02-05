@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <string.h>
 
 using namespace std;
 
@@ -32,31 +33,37 @@ namespace ANN_USM
 		ofstream vrep_error;
 		// Use this function to track the connection state to VREP. If the client is not connected to VREP, the program ends. If exist temporary disconections in-between, a warning message is emitted
 		void trackConnection();
+		// Set configuration for video recording mode
+		void setVideoRecordingMode(bool active = true);
+		// Parameter used for video recording mode;
+		bool video_recording_flag;
+		// Indicates that a simulation in progress
+		bool simulation_in_progress;
 
 	public:
 		/**
 		 * \brief Void constructor. Starts a communication thread with VREP through default ip address.
 		 */
-		RobotVREP();
+		RobotVREP(bool video_recording = false);
 
 		/**
 		 * \brief Constructor with parameters. Starts a communication thread with VREP through specific ip address.
 		 * \param ip The ip address where VREP is located.
 		 */
-		RobotVREP(const char * ip);
+		RobotVREP(const char * ip, bool video_recording = false);
 
 		/**
 		 * \brief Constructor with parameters. Starts a communication thread with VREP through specific port.
 		 * \param port The port number where to connect.
 		 */
-		RobotVREP(int port);
+		RobotVREP(int port, bool video_recording = false);
 
 		/**
 		 * \brief Constructor with parameters. Starts a communication thread with VREP through specific ip address and port.
 		 * \param ip The ip address where VREP is located.
 		 * \param port The port number where to connect.
 		 */
-		RobotVREP(const char * ip, int port);
+		RobotVREP(const char * ip, int port, bool video_recording = false);
 
 		/**
 		 * \brief Destructor. Ends the communication thread.
@@ -67,25 +74,25 @@ namespace ANN_USM
 		 * \brief Returns the ID of the current connection. Use this function to track the connection state to VREP. 
 		 * \return a connection ID, or -1 if the client is not connected to VREP. Different connection IDs indicate temporary disconections in-between.
 		 */
-		int GetConnectionId();
+		int getConnectionId();
 
 		/**
 		 * \brief Allows to temporarily halt the communication thread from sending data. This can be useful if you need to send several values to V-REP that should be received and evaluated at the same time.
 		 * \param action Whether the communication thread should pause or run normally. Use 1 for pause and 0 for run normally.
 		 */
-		void PauseCommunication(int action);
+		void pauseCommunication(int action);
 
 		/**
 		 * \brief Requests a start of a simulation (or a resume of a paused simulation).
 		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot if the argument is not passed.
 		 */
-		void StartSimulation(simxInt operationMode = simx_opmode_oneshot);
+		void startSimulation(simxInt operationMode = simx_opmode_oneshot);
 
 		/**
 		 * \brief Requests a stop of the running simulation.
 		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot if the argument is not passed.
 		 */
-		void StopSimulation(simxInt operationMode = simx_opmode_oneshot);
+		void stopSimulation(simxInt operationMode = simx_opmode_oneshot);
 
 		/**
 		 * \brief Retrieves an object handle based on its name.
@@ -93,7 +100,7 @@ namespace ANN_USM
 		 * \param handle Pointer to a value that will receive the handle.
 		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot if the argument is not passed.
 		 */
-		void GetObjectHandle(char name[], int * handle, simxInt operationMode = simx_opmode_oneshot);
+		void getObjectHandle(char name[], int * handle, simxInt operationMode = simx_opmode_oneshot);
 
 		/**
 		 * \brief Retrieves the position of an object.
@@ -102,7 +109,7 @@ namespace ANN_USM
 		 * \param position Pointer to 3 values receiving the position.
 		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot_wait if the argument is not passed.
 		 */
-		void GetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode = simx_opmode_oneshot_wait);
+		void getObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode = simx_opmode_oneshot_wait);
 
 		/**
 		 * \brief Retrieves the position of an object.
@@ -110,7 +117,7 @@ namespace ANN_USM
 		 * \param velocity Retrieves the linear velocity of an object.
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 		 */
-		void GetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode = simx_opmode_buffer);
+		void getObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode = simx_opmode_buffer);
 
 		/**
 		 * \brief Retrieves the orientation (Euler angles) of an object.
@@ -119,7 +126,7 @@ namespace ANN_USM
 		 * \param orientation Pointer to 3 values receiving the Euler angles (alpha, beta and gamma).
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 		 */
-		void GetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode = simx_opmode_buffer);
+		void getObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode = simx_opmode_buffer);
 
 		/**
 		 * \brief Retrieves the intrinsic position of a joint.
@@ -127,7 +134,7 @@ namespace ANN_USM
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 		 * \return The intrinsic position of the joint. This is a one-dimensional value: if the joint is revolute, the rotation angle is returned, if the joint is prismatic, the translation amount is returned, etc.
 		 */
-		double GetJointPosition(int object_handle, simxInt operationMode = simx_opmode_buffer);
+		double getJointPosition(int object_handle, simxInt operationMode = simx_opmode_buffer);
 
 		/**
 		 * \brief Sets the target position of a joint if the joint is in torque/force mode (also make sure that the joint's motor and position control are enabled).
@@ -135,7 +142,7 @@ namespace ANN_USM
 		 * \param joint_pos Target position of the joint (angular or linear value depending on the joint type).
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_oneshot (default) or simx_opmode_streaming.
 		 */
-		void SetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode = simx_opmode_oneshot);
+		void setJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode = simx_opmode_oneshot);
 
 		/**
 		 * \brief Retrieves the force or torque applied to a joint along/about its active axis. This function retrieves meaningful information only if the joint is prismatic or revolute, and is dynamically enabled. With the Bullet engine, this function returns the force or torque applied to the joint motor (torques from joint limits are not taken into account). With the ODE or Vortex engine, this function returns the total force or torque applied to a joint along/about its z-axis.
@@ -143,14 +150,14 @@ namespace ANN_USM
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 		 * \return The force or the torque applied to the joint along/about its z-axis.
 		 */
-		double GetJointForce(int object_handle, simxInt operationMode = simx_opmode_buffer);
+		double getJointForce(int object_handle, simxInt operationMode = simx_opmode_buffer);
 
 		/**
 		 * \brief Adds a message to the status bar.
 		 * \param message The message to display.
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_oneshot or simx_opmode_streaming.
 		 */
-		void AddStatusbarMessage(char * message, simxInt operationMode = simx_opmode_oneshot);
+		void addStatusbarMessage(char * message, simxInt operationMode = simx_opmode_oneshot);
 
 		/**
 		 * \brief Reads the collision state of a registered collision object.
@@ -158,7 +165,7 @@ namespace ANN_USM
 		 * \param collisionState A pointer to a value receiving the collision state (0: not colliding).
 		 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 		 */
-		void ReadCollision(int collisionHandle, int * collisionState, simxInt operationMode = simx_opmode_buffer);
+		void readCollision(int collisionHandle, int * collisionState, simxInt operationMode = simx_opmode_buffer);
 
 		/**
 		 * \brief Retrieves a collision object handle based on its name.
@@ -166,8 +173,14 @@ namespace ANN_USM
 		 * \param collisionHandle Pointer to a value that will receive the handle.
 		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot_wait if the argument is not passed.
 		 */
-		void GetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode = simx_opmode_oneshot_wait);
+		void getCollisionHandle(char name[], int * collisionHandle, simxInt operationMode = simx_opmode_oneshot_wait);
 
+		/**
+		 * \brief Change the path where the screen recording is saved VREP. This function can only be used if the simulator is stopped.
+		 * \param path Screen recording path.
+		 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot if the argument is not passed.
+		 */
+		void changeVideoPath(char path[], simxInt operationMode = simx_opmode_oneshot);
 	};
 }
 

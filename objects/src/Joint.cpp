@@ -120,7 +120,7 @@ Joint::Joint(RobotVREP * simulator, char name[], double max_value, double min_va
 	positions = new double[3];
 	filtered_positions = new double[3];
 
-	initial_position = truncValue(simulator->simGetJointPosition(handle, simx_opmode_oneshot_wait), PRECISION);
+	initial_position = truncValue(simulator->getJointPosition(handle, simx_opmode_oneshot_wait), PRECISION);
 
 	getJointForce(simx_opmode_streaming);
 	getJointCurrentPosition(simx_opmode_streaming);
@@ -185,7 +185,7 @@ void Joint::setJointPosition(double position)
 	filtered_positions[1] = filtered_positions[0];
 	filtered_positions[0] = Filter(positions[0]);
 		
-	if(simulator != NULL) simulator->simSetJointTargetPosition(handle, positions[0], simx_opmode_oneshot);
+	if(simulator != NULL) simulator->setJointTargetPosition(handle, positions[0], simx_opmode_oneshot);
 	else if (cm700 != NULL) cm700->setMotorPosition(id, (this->*robotInput)(positions[0]), *motor_velocity);
 	else clog << "ERROR: Function 'Joint::setJointPosition(double position, const char * unit)' not implemented in other enviroment" << endl;
 }
@@ -198,14 +198,14 @@ void Joint::setJointInitialPosition()
 	next_slope_sign = 1;
 	joint_change_direction = false;
 
-	if(simulator != NULL) simulator->simSetJointTargetPosition(handle, initial_position, simx_opmode_oneshot_wait);
+	if(simulator != NULL) simulator->setJointTargetPosition(handle, initial_position, simx_opmode_oneshot_wait);
 	else if (cm700 != NULL) cm700->setMotorPosition(id, (this->*robotInput)(initial_position), *motor_velocity);
 	else clog << "ERROR: Function 'Joint::setJointInitialPosition()' not implemented in other enviroment" << endl;
 }
 
 double Joint::getJointCurrentPosition()
 {
-	if (simulator != NULL) current_position = simulator->simGetJointPosition(handle, simx_opmode_buffer);
+	if (simulator != NULL) current_position = simulator->getJointPosition(handle, simx_opmode_buffer);
 	else if (cm700 != NULL) current_position = (this->*robotOutput)(cm700->getMotorPosition(id));
 	else clog << "ERROR: Function 'Joint::getJointCurrentPosition()' not implemented in other enviroment" << endl;
 
@@ -214,7 +214,7 @@ double Joint::getJointCurrentPosition()
 
 double Joint::getJointCurrentPosition(simxInt operationMode)
 {
-	if (simulator != NULL) current_position = simulator->simGetJointPosition(handle, operationMode);
+	if (simulator != NULL) current_position = simulator->getJointPosition(handle, operationMode);
 	else if (cm700 != NULL) current_position = (this->*robotOutput)(cm700->getMotorPosition(id));
 	else clog << "ERROR: Function 'Joint::getJointCurrentPosition()' not implemented in other enviroment" << endl;
 
@@ -224,7 +224,7 @@ double Joint::getJointCurrentPosition(simxInt operationMode)
 double Joint::getJointForce()
 {
 	double force = 0.0;
-	if (simulator != NULL) force = simulator->simGetJointForce(handle, simx_opmode_buffer);
+	if (simulator != NULL) force = simulator->getJointForce(handle, simx_opmode_buffer);
 	else if (cm700 != NULL) clog << "Not yet implemented" << endl;
 	else clog << "ERROR: Function 'Joint::getJointForce()' not implemented in other enviroment" << endl;
 
@@ -233,7 +233,7 @@ double Joint::getJointForce()
 
 double Joint::getJointForce(simxInt operationMode)
 {
-	if (simulator != NULL) force = simulator->simGetJointForce(handle, operationMode);
+	if (simulator != NULL) force = simulator->getJointForce(handle, operationMode);
 	else if (cm700 != NULL) clog << "Not yet implemented" << endl;
 	else clog << "ERROR: Function 'Joint::getJointForce()' not implemented in other enviroment" << endl;
 
