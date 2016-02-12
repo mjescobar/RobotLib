@@ -2,4 +2,6 @@ example/
 *.o
 *.txt
 doc/
-V-REP_PRO_EDU_V3_2_3_rev4_64_Linux/
+V-REP_PRO_EDU*/
+*_old/
+prueba*.*

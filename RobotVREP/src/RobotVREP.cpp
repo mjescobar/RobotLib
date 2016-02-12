@@ -21,7 +21,36 @@ void RobotVREP::trackConnection()
 
 void RobotVREP::setVideoRecordingMode(bool active)
 {
-	int error;
+	int error;	
+
+	if(active)
+	{		
+		char * aux_old_path;
+		int aux_old_path_len;
+
+		error = simxGetStringParameter(clientID, sim_stringparam_video_filename, (simxChar**)&aux_old_path,simx_opmode_oneshot_wait);
+		if(error != 0) vrep_error << "simxGetStringParameter: " << error << endl;		
+
+		aux_old_path_len = strlen(aux_old_path)+1;
+		old_path = new char[aux_old_path_len];
+		strncpy(old_path, aux_old_path, aux_old_path_len);
+
+		char * response;
+		int responselen;
+
+		error = simxGetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar**)&response, (simxInt*)&responselen,simx_opmode_streaming);
+		if(error != 0) vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
+
+		video_recording_flag = active;
+	}
+	else if(video_recording_flag)
+	{
+		int error = simxSetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar*)old_path, (simxInt)(strlen(old_path)+1), simx_opmode_oneshot);
+		if(error != 0) vrep_error << "simxSetStringSignal: videoPath - " << error << endl;
+
+		video_recording_flag = false;
+	}
+
 	error = simxSetBooleanParameter(clientID, sim_boolparam_video_recording_triggered, active, simx_opmode_oneshot);
 	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_video_recording_triggered" << error << endl;
 	error = simxSetBooleanParameter(clientID, sim_boolparam_browser_visible,!active, simx_opmode_oneshot);
@@ -29,13 +58,6 @@ void RobotVREP::setVideoRecordingMode(bool active)
 	error = simxSetBooleanParameter(clientID, sim_boolparam_hierarchy_visible,!active, simx_opmode_oneshot);
 	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_hierarchy_visible" << error << endl;
 
-	char * response;
-	int responselen;
-
-	error = simxGetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar**)&response, (simxInt*)&responselen,simx_opmode_streaming);
-	if(error != 0) vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
-
-	video_recording_flag = active;
 }
 
 RobotVREP::RobotVREP(bool video_recording)
@@ -108,6 +130,8 @@ RobotVREP::RobotVREP(const char * ip, int port, bool video_recording)
 
 RobotVREP::~RobotVREP()
 {
+	if (video_recording_flag) setVideoRecordingMode(false);
+
 	simxFinish(clientID);
 
 	vrep_error.close();

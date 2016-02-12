@@ -51,8 +51,6 @@ Object::~Object()
 	delete orientation;
 	delete lVelocity;
 	delete aVelocity;
-	if (simulator != NULL)	delete simulator;
-	else if (cm700 != NULL) delete cm700;
 }
 
 int Object::getHandle()

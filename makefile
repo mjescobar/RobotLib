@@ -1,19 +1,18 @@
-CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 LDFLAGS = -lpthread
 
-OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
-EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./RobotVREP/objects/RobotVREP.o ./robotCM700/objects/cm700.o ./robotCM700/objects/serial.o ./robotCM700/objects/dynamixel.o ./robotCM700/objects/dxl_hal.o
+RVODIR=RobotVREP/objects
+_RVOBJS = RobotVREP.o extApi.o extApiPlatform.o
+RVOBJS = $(patsubst %,$(RVODIR)/%,$(_RVOBJS))
 
-OS = $(shell uname -s)
-ECHO = @
+OODIR=objects/objects
+_OOBJS = Joint.o CollisionObject.o Object.o 
+OOBJS = $(patsubst %,$(OODIR)/%,$(_OOBJS))
 
-ifeq ($(OS), Linux)
-	CFLAGS += -D__linux
-else
-	CFLAGS += -D__APPLE__
-endif
+RCODIR=robotCM700/objects
+_RCOBJS = cm700.o serial.o dynamixel.o dxl_hal.o
+RCOBJS = $(patsubst %,$(RCODIR)/%,$(_RCOBJS))
 
-all: $(OBJS)
+all: 
 	@echo "Compiling RobotVREP"
 	@cd ./RobotVREP; make
 	@echo "Compiling robotCM700"
@@ -21,16 +20,13 @@ all: $(OBJS)
 	@echo "Compiling Objects"
 	@cd ./objects; make
 
-
-%.o: %.cpp
-		@echo "Compiling $< to $@"
-		$(ECHO)$(CXX) $(CFLAGS) -c $< -o $@
-
-%.o: %.c
-		@echo "Compiling $< to $@" 
-		$(ECHO)$(CC) $(CFLAGS) -c $< -o $@
-
 clean:
+		@rm -f $(OBJS)
+		@cd ./RobotVREP; make clean		
+		@cd ./robotCM700; make clean
+		@cd ./objects; make clean
+
+cleanall:
 		@rm -f $(OBJS)
 		@cd ./RobotVREP; make clean		
 		@cd ./robotCM700; make clean
@@ -41,16 +37,16 @@ cleandocs:
 	@rm -f -R ./doc
 
 install:
-	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(EXT_OBJS) $(OBJS) $(LDFLAGS)
+	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(OOBJS) $(RCOBJS) $(RVOBJS) $(LDFLAGS)
 	@ln -sf librobotlib.so.1.0 librobotlib.so
 	@ln -sf librobotlib.so.1.0 librobotlib.so.1
 	@mv librobotlib.so.1.0 librobotlib.so librobotlib.so.1 /usr/lib
 	@mkdir -p /usr/include/ROBOTLIB_headers/
-	@cp ./include/*.h /usr/include/ROBOTLIB_headers/
-	@cp ./remoteApi/*.h /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/include/*.h /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/remoteApi/*.h /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ./objects/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ./robotCM700/headers/* /usr/include/ROBOTLIB_headers/
-	@cp ./RobotVREP/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ROBOTLIB /usr/include
 	@chmod go+r /usr/include/ROBOTLIB_headers/*
 	@chmod go+r /usr/include/ROBOTLIB
