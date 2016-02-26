@@ -3,12 +3,17 @@ VPATH = ./src ./headers
 CFLAGS = -g -Wall -fPIC -I./src -I./headers -I./objects -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 LDFLAGS = -lpthread
 
-all: cm700.o serial.o dxl_hal.o dynamixel.o
+all: usb2dynamixel.o cm700.o serial.o dxl_hal.o dynamixel.o 
+
+usb2dynamixel.o: usb2dynamixel.cpp dynamixel.o
+	@mkdir -p objects
+	@echo "Compiling usb2dynamixel.cpp to usb2dynamixel.o"
+	@$(CC) $(CFLAGS) -c ./src/usb2dynamixel.cpp  -o ./objects/usb2dynamixel.o
 
 cm700.o: cm700.cpp dynamixel.o
 	@mkdir -p objects
 	@echo "Compiling cm700.cpp to cm700.o"
-	@$(CC) $(CFLAGS) -c ./src/cm700.cpp  -o ./objects/cm700.o
+	$(CC) $(CFLAGS) -c ./src/cm700.cpp  -o ./objects/cm700.o
 
 serial.o: serial.cpp
 	@mkdir -p objects

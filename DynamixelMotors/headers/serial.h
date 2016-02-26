@@ -26,9 +26,7 @@ extern "C" {
 	void serial_send(int serial_fd, char *data, int size);
 	int  serial_read(int serial_fd, uint8_t *data, int size, int timeout_usec);
 	void serial_close(int fd);
-
 	void delay(int secs);
-
 	int serial_io_flush(int serial_fd);
 	int serial_inputflush(int serial_fd);
 	int serial_outputflush(int serial_fd);

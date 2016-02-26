@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char * argv[])
 {
 
-	if (dxl_initialize(argv[1], 1) == 0) 
+	if (dxl_initialize("/dev/ttyUSB0", 1) == 0) 
 	{
 		cout << "Failed to open USB2Dynamixel!" << endl;
 		cout << "Press Enter key to terminate..." << endl;
@@ -18,13 +18,13 @@ int main(int argc, char * argv[])
 	{
 		cout << "USB2Dynamixel inicializado!" << endl;
 	}
-
-
 	
-	dxl_set_txpacket_id( BROADCAST_ID );
-	dxl_set_txpacket_length(4);
+	dxl_set_txpacket_id( 0xFE );
+	dxl_set_txpacket_length( 4 );
 	dxl_set_txpacket_instruction( INST_WRITE );
-	dxl_set_txpacket_parameter( 0, 99 );
+	dxl_set_txpacket_parameter( 0, 0x03 );
+	dxl_set_txpacket_parameter( 1, 98 );
+
 	dxl_tx_packet();
 	if ( dxl_get_result() != COMM_TXSUCCESS )
 	{
@@ -33,5 +33,4 @@ int main(int argc, char * argv[])
 		std::cout << "all fine" << std::endl;
 
 	return 0;
-
 }

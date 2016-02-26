@@ -1,6 +1,6 @@
 /* */
-#ifndef CM700_H
-#define CM700_H
+#ifndef USB2Dynamixel_H
+#define USB2Dynamixel_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +15,8 @@
 #include "dynamixel.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>    // std::find
+#include "motor.h"
 
 /* MEMADDR */
 #define P_MODEL_L				0
@@ -53,32 +55,11 @@
 #define _H16(x)			((x >> 8) & 0xFF)
 #define _MW(x, y)		(y * 256 + x)
 
-enum Models 
-{
-	AX12 = 12,
-	MX64 = 54
-};
+
 
 using namespace std;
 
-struct Motor 
-{
-	int id;
-	int cposition;
-	int tposition;
-	int cspeed;
-	int tspeed;
-	int load;
-	int volt;
-	int current;
-	int temperature;
-	int angleResolution;
-	bool hasCurrentSensor;
-	int velocityResolution;
-	double angleRangeDeg; // in case that the dynamixel motor have not 360 deg of range like ax12 that have only 300 deg of range.s
-};
-
-class CM700 
+class USB2Dynamixel 
 {
 	int fd;
 	uint8_t buffer_in [ 255 ];
@@ -89,17 +70,17 @@ class CM700
 	std::vector < int > idMotorsWithNewPosition_Vect;
 
 public:	
-	CM700 (string serialPort, int baudNum);
-	~CM700(); 
+	USB2Dynamixel (string serialPort, int baudNum);
+	~USB2Dynamixel(); 
 	void addMotor(int id);
 	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
-	int getMotorPosition(int id);
+	double getMotorAngle(int id);
 	void refreshAll();
 	void move();
 	void setTorque(bool enable);
 	void printValues();
 	bool verifyModel(int model);
 	void setMotorParametersFromModel(int model, Motor &motor);	
-	void setMotorPosition(int id, double angle_RAD, double velocity);
+	void setNextMotorAngle(int id, double angle_RAD, double velocity);
 };
 #endif

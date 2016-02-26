@@ -1,14 +1,12 @@
-#ifndef CM700_CPP
-#define CM700_CPP
 
-#include "cm700.h"
+#include "usb2dynamixel.h"
 
 //#define _DEBUG
 
 /*
 	remember: BaudRate = 2.000.000/(baudNum + 1) 
 */
-CM700::CM700(string serialPort, int baudNum = 1) 
+USB2Dynamixel::USB2Dynamixel(string serialPort, int baudNum = 1) 
 {
 	// Se comienza la comunicacion serial con los motores.
 	if (dxl_initialize(serialPort.c_str(), baudNum) == 0) 
@@ -24,19 +22,25 @@ CM700::CM700(string serialPort, int baudNum = 1)
 	}
 }
 
-CM700::~CM700( ) 
+USB2Dynamixel::~USB2Dynamixel( ) 
 {
 	motors.clear();
 }
 
 //We try to obtain the most information posible to create the motor throught the motor model number, if is not in our registers then is necesary to use the other constructor.
-void CM700::addMotor(int id)
+void USB2Dynamixel::addMotor(int id)
 {
+
+	std::cerr << "ERROR::USB2Dynamixel::addMotor(int id)::The function is non functional, there are problems with linux sdk of usb2dynamixel in read protocols. " << std::endl;
+	exit(EXIT_FAILURE);
+/*	
+	Problem: usb2dynamixel sdk for linux work bad in respect to read data, for this reason this function dont work right now.
+
 	//Verifing that the id is unique
-	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
+	if( idToMotorsVectorPosition_map.find( id ) != idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
-		std::cerr << "ERROR::CM700::addMotor::The id already exist" << std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::addMotor::The id already exist" << std::endl;
 		exit (EXIT_FAILURE);
 	}
 
@@ -45,12 +49,12 @@ void CM700::addMotor(int id)
 	// Obtaining information about the motor throught consulting the dynamixel motor connected with the corresponding id.
 
 	//Obtaining the model number.
-	int model = 1;
+	int model = AX12;
 
 	//Verify if the model is in our register, in case that is not in our registers then a error es sent.
 	if ( !verifyModel( model ) )
 	{
-		std::cerr << "ERROR::void CM700::addMotor(int id)::Your dynamixel model is not in our register, in that case you have to use an alternative addMotor method" << std::endl;
+		std::cerr << "ERROR::void USB2Dynamixel::addMotor(int id)::Your dynamixel model is not in our register, in that case you have to use an alternative addMotor method" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -60,34 +64,24 @@ void CM700::addMotor(int id)
 	// Adding the motor
 	motors.push_back( motor );
 	idToMotorsVectorPosition_map.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
+*/
 }
 
 
 
 //We try to obtain the most information posible to create the motor throught the motor model number, if is not in our registers then is necesary to use the other constructor.
-void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg)
+void USB2Dynamixel::addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg)
 {
 	//Verifing that the id is unique
-	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
+	if( idToMotorsVectorPosition_map.find( id ) != idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
-		std::cerr << "ERROR::CM700::addMotor::The id already exist" << std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::addMotor::The id already exist:: " << std::endl;
 		exit (EXIT_FAILURE);
 	}
 
 	Motor motor;
 	motor.id = id;
-	// Obtaining information about the motor throught consulting the dynamixel motor connected with the corresponding id.
-
-	//Obtaining the model number.
-	int model = 1;
-
-	//Verify if the model is in our register, in case that is not in our registers then a error es sent.
-	if ( !verifyModel( model ) )
-	{
-		std::cerr << "ERROR::void CM700::addMotor(int id)::Your dynamixel model is not in our register, in that case you have to use an alternative addMotor method" << std::endl;
-		exit(EXIT_FAILURE);
-	}
 
 	//Settings motors values from model.
 	motor.angleResolution = angleResolution;
@@ -102,12 +96,12 @@ void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int vel
 
 
 
-void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity)
+void USB2Dynamixel::setNextMotorAngle(int id, double angle_RAD, double normalizedVelocity)
 {
 	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
-		std::cerr << "ERROR::CM700::setMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
 		exit (EXIT_FAILURE);
 	}
 
@@ -129,12 +123,12 @@ void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity
 	//Cheking inpuit are coherent.
 	if(normalizedVelocity > 1 || normalizedVelocity < 0 )
 	{
-		std::cerr << "ERROR::CM700::setMotorPosition::normalizedVelocity must be in [0,1]" <<  std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::normalizedVelocity must be in [0,1]" <<  std::endl;
 		exit(EXIT_FAILURE);
 	}
 	if ( fabs(angle_RAD) >= motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0) ) 
 	{
-		std::cerr << "ERROR::CM700::setMotorPosition::angle_RAD is not in the phisical angle range of the dynamixel motor" <<  std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::angle_RAD is not in the phisical angle range of the dynamixel motor" <<  std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -142,9 +136,9 @@ void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity
 	// EACH MODEL COULD HAVE DIFERENT AMOUNT OF ANGLE RESOLUTION, THAT MEANS THAT A ANDLE IN RAD WILL BE A DIFERENT GOALPOSITION VALUE.
 
 	// the goal position have to be transformed taking in account that the value 0 is not in the mitdle but in one extreme (the midle is in the angleResolution/2) and that the dynamizel could have a range of degress and not always 360 degrees
-	int goalPosition = (int)( motors.at( motorVectorPosition ).angleResolution 
-		+ ( motors.at( motorVectorPosition ).angleResolution/( motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0) ) ) 
-		* (angle_RAD + motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0)/2.0 ) );
+	double resolution =  motors.at( motorVectorPosition ).angleResolution ;
+	double range = 	motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0);
+	int goalPosition = resolution/2.0 + resolution*angle_RAD/range; // position = resolution/2 -> angle = 0;; position = 0 -> angle = -range/2 (creating the line is obtained the equation)
 	// the speed is scaled because for convention is normalized then 0 is the minimum and 1 is the max value.
 	int speed = (int)( normalizedVelocity * motors.at(motorVectorPosition).velocityResolution);
 	motors.at( motorVectorPosition ).tposition = goalPosition;
@@ -155,25 +149,28 @@ void CM700::setMotorPosition(int id, double angle_RAD, double normalizedVelocity
 	// take in account that if is in that vector then is no necesary put it aggain
 	std::vector<int>::iterator it;
 	it = find (idMotorsWithNewPosition_Vect.begin(), idMotorsWithNewPosition_Vect.end(), id);
-	if (it == myvector.end())
+	if (it == idMotorsWithNewPosition_Vect.end())
 	{
 		idMotorsWithNewPosition_Vect.push_back( id ); // Only if is not in the vector this line occur
 	}
 }
 
-int CM700::getMotorPosition(int id)
+double USB2Dynamixel::getMotorAngle( int id ) 
 {
 	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
-		std::cerr << "ERROR::CM700::getMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
+		std::cerr << "ERROR::USB2Dynamixel::getMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
 		exit (EXIT_FAILURE);
 	}
 	auto motorVectorPosition = idToMotorsVectorPosition_map.at( id );
-	return motors.at(motorVectorPosition).cposition;
-} 
+	int position = motors.at(motorVectorPosition).cposition;
+	double resolution =  motors.at( motorVectorPosition ).angleResolution ;
+	double range = 	motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0);
+	return ( position - resolution/2.0 )*(range/resolution) ;// position = resolution/2 -> angle = 0;; position = 0 -> angle = -range/2 (creating the line is obtained the equation)
+}
 
-void CM700::refreshAll()
+void USB2Dynamixel::refreshAll()
 {
 	for (unsigned int i = 0; i < motors.size(); i++) 
 	{
@@ -216,7 +213,7 @@ void CM700::refreshAll()
 	}
 }
 
-void CM700::move()
+void USB2Dynamixel::move()
 {
 	int param_per_actuator = 4;
 	
@@ -257,7 +254,7 @@ void CM700::move()
 }
 
 
-void CM700::printValues() {
+void USB2Dynamixel::printValues() {
 	for (unsigned int i = 0; i < motors.size(); i++) {
 		printf("[%03u] [CP: %4u|TP: %4u] [CV: %4u|TV: %4u]\n",
 			motors.at(i).id,
@@ -266,7 +263,7 @@ void CM700::printValues() {
 	}
 }
 
-bool CM700::verifyModel ( int model )
+bool USB2Dynamixel::verifyModel ( int model )
 {
 	if(model == AX12)
 	{
@@ -279,7 +276,7 @@ bool CM700::verifyModel ( int model )
 	return false;
 } 
 
-void CM700::setMotorParametersFromModel (int model, Motor & motor)
+void USB2Dynamixel::setMotorParametersFromModel (int model, Motor & motor)
 {	
 	if(model == AX12)
 	{
@@ -297,5 +294,3 @@ void CM700::setMotorParametersFromModel (int model, Motor & motor)
 		motor.angleRangeDeg = 360;
 	}
 }
-
-#endif

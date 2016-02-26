@@ -6,16 +6,12 @@
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-
 #include "dxl_hal.h"
-
-
 
 int		gSocket_fd		= -1;
 long	glStartTime		= 0;
 float	gfRcvWaitTime	= 0.0f;
 float	gfByteTransTime	= 0.0f;
-
 char	gDeviceName		[ 20 ];
 
 int dxl_hal_open(const char * serialDeviceName, float baudrate)
