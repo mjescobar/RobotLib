@@ -69,8 +69,8 @@ namespace ANN_USM
 		double (Joint::*robotOutput)(double);
 		// Pointer to velocity value of the respective motor in real robot.
 		int * motor_velocity;
-		// Trunc the number from decimal digits of some value.
-		double truncValue(double value, int precision);
+		
+		
 		//convert value from radians to radians.
 		double RADtoRAD(double value);
 		//convert value from degrees to radians.
@@ -89,6 +89,9 @@ namespace ANN_USM
 		double Filter(double value);
 
 		double * filtered_positions;
+		
+		// The common values of all tipe of motor is initialized in this function.
+		void initParameters (double max_value, double min_value, const char * unit)
 
 	public:
 
@@ -100,16 +103,6 @@ namespace ANN_USM
 		 * \param min_value Minimum value of the motor position.
 		 * \param unit Unit used in the user workspace.
 		 * \param position Initial position asigned to the motor.
-		 */
-		Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit, double position);
-
-		/**
-		 * \brief Constructor with parameters.
-		 * \param simulator Object of type Robotsimulator used to interact with VREP.
-		 * \param name Name of the Joint object.
-		 * \param max_value Maximum value of the motor position.
-		 * \param min_value Minimum value of the motor position.
-		 * \param unit Unit used in the user workspace.
 		 */
 		Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit);
 
@@ -221,5 +214,11 @@ namespace ANN_USM
 		void refreshValues();
 	};
 }
+
+
+
+
+// Trunc the number from decimal digits of some value.
+double truncValue(double value, int precision);
 
 #endif
