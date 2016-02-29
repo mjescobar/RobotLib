@@ -17,10 +17,11 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>    // std::find
+#include "dynamixelMotor.hpp"
 
 using namespace std;
 
-class CM700 
+class CM700 : public DynamixelMotor
 {
 	int 					fd;
 	uint8_t 				buffer_in [ 255 ];

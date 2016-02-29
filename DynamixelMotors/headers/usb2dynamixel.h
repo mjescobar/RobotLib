@@ -17,6 +17,7 @@
 #include <iostream>
 #include <algorithm>    // std::find
 #include "motor.h"
+#include "dynamixelMotor.hpp"
 
 /* MEMADDR */
 #define P_MODEL_L				0
@@ -59,7 +60,7 @@
 
 using namespace std;
 
-class USB2Dynamixel 
+class USB2Dynamixel : public DynamixelMotor
 {
 	int fd;
 	uint8_t buffer_in [ 255 ];
