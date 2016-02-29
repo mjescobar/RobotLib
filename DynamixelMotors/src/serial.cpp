@@ -79,7 +79,7 @@ int serial_open(char *serial_name, speed_t baudrate)
 /*   -serial_fd: Serial device descriptor            */
 /*   -data:      data string to send                 */
 /*   -size:      data string size                    */
-/*****************************************************/
+/*****************************************************/ 
 void serial_send(int serial_fd, char *data, int size)
 {
   if(write(serial_fd, data, size) == -1) cerr << "ERROR: Write fail" << endl;
@@ -101,7 +101,7 @@ void serial_close(int serial_fd)
 /*-----------------------------------------------------------------------*/
 /* INPUT                                                                 */
 /*   -serial_fd: Serial device descriptor                                */
-/*   -size: Maximum data size to receive                                 */ 
+/*   -size: Maximum data size to receive                                 */
 /*   -timeout_usec: Timeout time (in micro-secs) for receiving the data  */
 /*                                                                       */
 /* OUTPUT:                                                               */

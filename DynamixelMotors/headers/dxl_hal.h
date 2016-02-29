@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-int dxl_hal_open(int deviceIndex, float baudrate);
+int dxl_hal_open(const char * serialDeviceName, float baudrate);
 void dxl_hal_close();
 int dxl_hal_set_baud( float baudrate );
 void dxl_hal_clear();

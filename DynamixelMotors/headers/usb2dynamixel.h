@@ -1,6 +1,6 @@
 /* */
-#ifndef CM700_H
-#define CM700_H
+#ifndef USB2Dynamixel_H
+#define USB2Dynamixel_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,11 +8,16 @@
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
-
+#include <string>
+#include <vector>
+#include <map>
 #include "serial.h"
 #include "dynamixel.h"
-
+#include <cmath>
 #include <iostream>
+#include <algorithm>    // std::find
+#include "motor.h"
+#include "dynamixelMotor.hpp"
 
 /* MEMADDR */
 #define P_MODEL_L				0
@@ -31,10 +36,10 @@
 #define P_PRESENT_LOAD_H        41
 #define P_PRESENT_VOLTAGE       42
 #define P_PRESENT_TEMPERATURE   43
+#define P_CURRENT_LOW			(68)
 
 #define TAMANO_BUFFER_COMUNICACION 10000
 #define USE_USB2DXL
-#define PUERTO_SERIAL "/dev/ttyUSB0"
 
 #define DEF_TIMEOUT		100000
 #define SETPOSNDVEL		0x02
@@ -52,50 +57,31 @@
 #define _MW(x, y)		(y * 256 + x)
 
 
+
 using namespace std;
 
-struct actuador {
-	int id;
-
-	int cposition;
-	int tposition;
-
-	int cspeed;
-	int tspeed;
-
-	int load;
-
-	int volt;
-	int current;
-	int temperature;
-};
-
-class CM700 {
+class USB2Dynamixel : public DynamixelMotor
+{
 	int fd;
-	char *serial_name;
+	uint8_t buffer_in [ 255 ];
+	char buffer_out [ 255 ];
+	string serialPort;
+	std::vector <Motor> motors;
+	std::map <int , int  > idToMotorsVectorPosition_map;
+	std::vector < int > idMotorsWithNewPosition_Vect;
 
-	uint8_t buffer_in[255];
-	char buffer_out[255];
-
-	int num_actuadores;
-	int actuadores_leg;
-
-	struct actuador *actuadores;
-	struct actuador servocam;
-	time_t timestamp;
-public:
-	
-	CM700(int, int);
-	~CM700(void);
-
-	void setMotorPosition(int id, int pos, int vel);
-	int getMotorPosition(int id);
+public:	
+	USB2Dynamixel (string serialPort, int baudNum);
+	~USB2Dynamixel(); 
+	void addMotor(int id);
+	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
+	double getMotorAngle(int id);
 	void refreshAll();
-	void moveAll();
+	void move();
 	void setTorque(bool enable);
 	void printValues();
-	
-	friend class Robot;
-	friend class Leg;
+	bool verifyModel(int model);
+	void setMotorParametersFromModel(int model, Motor &motor);	
+	void setNextMotorAngle(int id, double angle_RAD, double velocity);
 };
 #endif
