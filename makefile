@@ -3,7 +3,7 @@ LDFLAGS = -lpthread
 
 OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
 
-EXT_OBJS = ./objects/objects/Joint.o ./objects/objects/Dummy.o ./objects/objects/CollisionObject.o ./objects/objects/Object.o ./robotSimulator/objects/RobotSimulator.o ./DynamixelMotors/objects/cm700.o ./DynamixelMotors/objects/serial.o ./DynamixelMotors/objects/dynamixel.o ./DynamixelMotors/objects/dxl_hal.o
+EXT_OBJS = ./robotObjects/objects/Joint.o ./robotObjects/objects/Dummy.o ./robotObjects/objects/CollisionObject.o ./robotObjects/objects/Object.o ./RobotVREP/objects/RobotVREP.o ./DynamixelMotors/objects/cm700.o ./DynamixelMotors/objects/serial.o ./DynamixelMotors/objects/dynamixel.o ./DynamixelMotors/objects/dxl_hal.o
 
 
 OS = $(shell uname -s)
@@ -16,13 +16,12 @@ else
 endif
 
 all: $(OBJS)
-
-	@echo "Compiling RobotSimulator"
-	@cd ./robotSimulator; make
+	@echo "Compiling RobotVREP"
+	@cd ./RobotVREP; make
 	@echo "Compiling DynamixelMotors"
 	@cd ./DynamixelMotors; make
-	@echo "Compiling Objects"
-	@cd ./objects; make
+	@echo "Compiling robotObjects"
+	@cd ./robotObjects; make
 
 
 %.o: %.cpp
@@ -37,7 +36,7 @@ clean:
 		@rm -f $(OBJS)
 		@cd ./RobotVREP; make clean		
 		@cd ./robotCM700; make clean
-		@cd ./objects; make clean
+		@cd ./robotObjects; make clean
 		@cd ./example; make clean
 
 cleandocs:
@@ -51,7 +50,7 @@ install:
 	@mkdir -p /usr/include/ROBOTLIB_headers/
 	@cp ./include/*.h /usr/include/ROBOTLIB_headers/
 	@cp ./remoteApi/*.h /usr/include/ROBOTLIB_headers/
-	@cp ./objects/headers/* /usr/include/ROBOTLIB_headers/
+	@cp ./robotObjects/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ./robotCM700/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ./RobotVREP/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ROBOTLIB /usr/include

@@ -1,6 +1,3 @@
-#ifndef JOINT_CPP
-#define JOINT_CPP
-
 #include "Joint.hpp"
 #include <iostream>
 
@@ -261,7 +258,3 @@ void Joint::initParameters (double max_value, double min_value, const char * uni
 	}
 }
 	
-
-
-#endif
-

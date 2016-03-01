@@ -1,9 +1,7 @@
-#ifndef ROBOTVREP_CPP
-#define ROBOTVREP_CPP
 
 #include "RobotVREP.hpp"
 
-using namespace ANN_USM;
+
 
 RobotVREP::RobotVREP()
 {
@@ -191,5 +189,3 @@ void RobotVREP::simGetCollisionHandle(char name[], int * collisionHandle, simxIn
 	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
 	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;
 }
-
-#endif

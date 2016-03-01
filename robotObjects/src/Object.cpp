@@ -1,13 +1,9 @@
-#ifndef OBJECT_CPP
-#define OBJECT_CPP
-
 #include "Object.hpp"
-using namespace ANN_USM;
 
 Object::Object(RobotVREP * simulator, char name[])
 {
 	this->simulator = simulator;
-	this->cm700 = NULL;
+	this->dynamixelMotor = NULL;
 
 	int size = strlen(name)+1;
 	this->name = new char[size];
@@ -24,10 +20,10 @@ Object::Object(RobotVREP * simulator, char name[])
 	getVelocity(NULL,NULL,simx_opmode_streaming);
 }
 
-Object::Object(CM700 * cm700, char name[], int id)
+Object::Object(DynamixelMotor * dynamixelMotor, char name[], int id)
 {
 	this->simulator = NULL;
-	this->cm700 = cm700;
+	this->dynamixelMotor = dynamixelMotor;
 
 	int size = strlen(name)+1;
 	this->name = new char[size];
@@ -52,7 +48,7 @@ Object::~Object()
 	delete lVelocity;
 	delete aVelocity;
 	if (simulator != NULL)	delete simulator;
-	else if (cm700 != NULL) delete cm700;
+	else if (dynamixelMotor != NULL) delete dynamixelMotor;
 }
 
 int Object::getHandle()
@@ -132,5 +128,3 @@ void Object::getVelocity(double lVel[3], double aVel[3], simxInt operationMode)
 		for (int i = 0; i < 3; i++)
 			aVel[i] = aVelocity[i];		
 }
-
-#endif

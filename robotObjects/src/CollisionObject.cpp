@@ -2,7 +2,6 @@
 #define COLLISIONOBJECT_CPP
 
 #include "CollisionObject.hpp"
-using namespace ANN_USM;
 
 CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
 {
