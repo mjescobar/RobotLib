@@ -1,21 +1,21 @@
-CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 LDFLAGS = -lpthread
+
 
 OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
 
 EXT_OBJS = ./robotObjects/objects/Joint.o ./robotObjects/objects/Dummy.o ./robotObjects/objects/CollisionObject.o ./robotObjects/objects/Object.o ./RobotVREP/objects/RobotVREP.o ./DynamixelMotors/objects/cm700.o ./DynamixelMotors/objects/serial.o ./DynamixelMotors/objects/dynamixel.o ./DynamixelMotors/objects/dxl_hal.o
 
 
-OS = $(shell uname -s)
-ECHO = @
 
-ifeq ($(OS), Linux)
-	CFLAGS += -D__linux
-else
-	CFLAGS += -D__APPLE__
-endif
+OODIR=objects/objects
+_OOBJS = Joint.o CollisionObject.o Object.o 
+OOBJS = $(patsubst %,$(OODIR)/%,$(_OOBJS))
 
-all: $(OBJS)
+RCODIR=DynamixelMotors/objects
+_RCOBJS = cm700.o serial.o dynamixel.o dxl_hal.o
+RCOBJS = $(patsubst %,$(RCODIR)/%,$(_RCOBJS))
+
+all: 
 	@echo "Compiling RobotVREP"
 	@cd ./RobotVREP; make
 	@echo "Compiling DynamixelMotors"
@@ -23,36 +23,34 @@ all: $(OBJS)
 	@echo "Compiling robotObjects"
 	@cd ./robotObjects; make
 
-
-%.o: %.cpp
-		@echo "Compiling $< to $@"
-		$(ECHO)$(CXX) $(CFLAGS) -c $< -o $@
-
-%.o: %.c
-		@echo "Compiling $< to $@" 
-		$(ECHO)$(CC) $(CFLAGS) -c $< -o $@
-
 clean:
 		@rm -f $(OBJS)
 		@cd ./RobotVREP; make clean		
-		@cd ./robotCM700; make clean
+		@cd ./DynamixelMotors; make clean
 		@cd ./robotObjects; make clean
-		@cd ./example; make clean
+
+
+cleanall:
+		@rm -f $(OBJS)
+		@cd ./RobotVREP; make clean		
+		@cd ./DynamixelMotors; make clean
+		@cd ./objects; make clean
+
 
 cleandocs:
 	@rm -f -R ./doc
 
 install:
-	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(EXT_OBJS) $(OBJS) $(LDFLAGS)
+	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(OOBJS) $(RCOBJS) $(RVOBJS) $(LDFLAGS)
 	@ln -sf librobotlib.so.1.0 librobotlib.so
 	@ln -sf librobotlib.so.1.0 librobotlib.so.1
 	@mv librobotlib.so.1.0 librobotlib.so librobotlib.so.1 /usr/lib
 	@mkdir -p /usr/include/ROBOTLIB_headers/
-	@cp ./include/*.h /usr/include/ROBOTLIB_headers/
-	@cp ./remoteApi/*.h /usr/include/ROBOTLIB_headers/
 	@cp ./robotObjects/headers/* /usr/include/ROBOTLIB_headers/
-	@cp ./robotCM700/headers/* /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/include/*.h /usr/include/ROBOTLIB_headers/
+	@cp ./RobotVREP/remoteApi/*.h /usr/include/ROBOTLIB_headers/
 	@cp ./RobotVREP/headers/* /usr/include/ROBOTLIB_headers/
+	@cp ./DynamixelMotors/headers/* /usr/include/ROBOTLIB_headers/
 	@cp ROBOTLIB /usr/include
 	@chmod go+r /usr/include/ROBOTLIB_headers/*
 	@chmod go+r /usr/include/ROBOTLIB

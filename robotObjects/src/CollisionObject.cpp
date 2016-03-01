@@ -1,6 +1,3 @@
-#ifndef COLLISIONOBJECT_CPP
-#define COLLISIONOBJECT_CPP
-
 #include "CollisionObject.hpp"
 
 CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
@@ -43,5 +40,3 @@ int CollisionObject::getCollisionState()
 	
 	return collisionState;
 }
-
-#endif

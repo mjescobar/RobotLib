@@ -1,6 +1,6 @@
 // This file is part of the REMOTE API
 // 
-// Copyright 2006-2014 Coppelia Robotics GmbH. All rights reserved. 
+// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
 // marc@coppeliarobotics.com
 // www.coppeliarobotics.com
 // 
@@ -24,7 +24,7 @@
 // along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.1.3 on Sept. 30th 2014
+// This file was automatically created for V-REP release V3.2.3 rev4 on December 21st 2015
 
 #include "extApi.h"
 #include "extApiInternal.h"
@@ -2570,13 +2570,13 @@ EXTAPI_DLLEXPORT simxInt simxLoadModel(simxInt clientID,const simxChar* modelPat
 		tmpFileName[21]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[22]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[23]='0'+(char)(extApi_rand()*9.1f);
-		returnValue=simxTransferFile(clientID,modelPathAndName,tmpFileName,60000,simx_opmode_oneshot_wait);
+		returnValue=simxTransferFile(clientID,modelPathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_oneshot_wait);
 		if (returnValue==0)
 		{
 			dataPointer=_exec_string(clientID,simx_cmd_load_model,operationMode,0,(simxUChar*)tmpFileName,&returnValue);
 			simxEraseFile(clientID,tmpFileName,simx_opmode_oneshot);
 		}
-		simxTransferFile(clientID,modelPathAndName,tmpFileName,60000,simx_opmode_remove);
+		simxTransferFile(clientID,modelPathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_remove);
 	}
 	else
 		dataPointer=_exec_string(clientID,simx_cmd_load_model,operationMode,0,(simxUChar*)modelPathAndName,&returnValue);
@@ -2601,13 +2601,13 @@ EXTAPI_DLLEXPORT simxInt simxLoadUI(simxInt clientID,const simxChar* uiPathAndNa
 		tmpFileName[21]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[22]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[23]='0'+(char)(extApi_rand()*9.1f);
-		returnValue=simxTransferFile(clientID,uiPathAndName,tmpFileName,60000,simx_opmode_oneshot_wait);
+		returnValue=simxTransferFile(clientID,uiPathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_oneshot_wait);
 		if (returnValue==0)
 		{
 			dataPointer=_exec_string(clientID,simx_cmd_load_ui,operationMode,0,(simxUChar*)tmpFileName,&returnValue);
 			simxEraseFile(clientID,tmpFileName,simx_opmode_oneshot);
 		}
-		simxTransferFile(clientID,uiPathAndName,tmpFileName,60000,simx_opmode_remove);
+		simxTransferFile(clientID,uiPathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_remove);
 	}
 	else
 		dataPointer=_exec_string(clientID,simx_cmd_load_ui,operationMode,0,(simxUChar*)uiPathAndName,&returnValue);
@@ -2635,13 +2635,13 @@ EXTAPI_DLLEXPORT simxInt simxLoadScene(simxInt clientID,const simxChar* scenePat
 		tmpFileName[21]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[22]='0'+(char)(extApi_rand()*9.1f);
 		tmpFileName[23]='0'+(char)(extApi_rand()*9.1f);
-		returnValue=simxTransferFile(clientID,scenePathAndName,tmpFileName,5*60000,simx_opmode_oneshot_wait); /* 5 min. time-out */
+		returnValue=simxTransferFile(clientID,scenePathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_oneshot_wait); 
 		if (returnValue==0)
 		{
 			_exec_string(clientID,simx_cmd_load_scene,operationMode,0,(simxUChar*)tmpFileName,&returnValue);
 			simxEraseFile(clientID,tmpFileName,simx_opmode_oneshot);
 		}
-		simxTransferFile(clientID,scenePathAndName,tmpFileName,5*60000,simx_opmode_remove);
+		simxTransferFile(clientID,scenePathAndName,tmpFileName,_replyWaitTimeoutInMs[clientID],simx_opmode_remove);
 	}
 	else
 		_exec_string(clientID,simx_cmd_load_scene,operationMode,0,(simxUChar*)scenePathAndName,&returnValue);
@@ -3132,6 +3132,20 @@ EXTAPI_DLLEXPORT simxInt simxGetDistanceHandle(simxInt clientID,const simxChar* 
 	if (operationMode==simx_opmode_remove)
 		return(_removeCommandReply_string(clientID,simx_cmd_get_distance_handle,(simxUChar*)distanceObjectName));
 	dataPointer=_exec_string(clientID,simx_cmd_get_distance_handle,operationMode,0,(simxUChar*)distanceObjectName,&returnValue);
+	if ((dataPointer!=0)&&(returnValue==0))
+		handle[0]=_readPureDataInt(dataPointer,0,0);
+	return(returnValue);
+}
+
+EXTAPI_DLLEXPORT simxInt simxGetCollectionHandle(simxInt clientID,const simxChar* collectionName,simxInt* handle,simxInt operationMode)
+{
+	simxUChar* dataPointer;
+	simxInt returnValue;
+	if (_communicationThreadRunning[clientID]==0)
+		return(simx_return_initialize_error_flag);
+	if (operationMode==simx_opmode_remove)
+		return(_removeCommandReply_string(clientID,simx_cmd_get_collection_handle,(simxUChar*)collectionName));
+	dataPointer=_exec_string(clientID,simx_cmd_get_collection_handle,operationMode,0,(simxUChar*)collectionName,&returnValue);
 	if ((dataPointer!=0)&&(returnValue==0))
 		handle[0]=_readPureDataInt(dataPointer,0,0);
 	return(returnValue);
@@ -3989,7 +4003,6 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetVisionSensorImage(JNIEnv *
 		jintArray resArray = (jintArray)env->CallObjectMethod(res, mid, 2);
 		env->SetIntArrayRegion(resArray, 0, 2, (jint *)resolution);
 
-		//jsize start = 0;
 		jsize size = (options&1) ? (resolution[0]*resolution[1]) : (resolution[0]*resolution[1]*3);
 		cls = env->GetObjectClass(img);
 		mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
@@ -3998,7 +4011,6 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetVisionSensorImage(JNIEnv *
 		for (jsize i=0;i<size;i++)
 			arr[i]=(unsigned char)image[i];
 		env->ReleaseCharArrayElements(imgArray,arr, 0);			
-		//env->SetCharArrayRegion(imgArray, start, size, (const jchar *)image);
 	}
 
 	return retVal;
@@ -4013,7 +4025,6 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxSetVisionSensorImage(JNIEnv *
 	simxInt operationMode = opMode;
 
 	char* imgbuf=new char[bufferSize];
-	//jsize start = 0;
 	jsize size = bufsize;	
 	jclass cls = env->GetObjectClass(img);
 	jmethodID mid = env->GetMethodID(cls, "getArray", "()[C");
@@ -4022,7 +4033,6 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxSetVisionSensorImage(JNIEnv *
 	for (jsize i=0;i<size;i++)
 		imgbuf[i]=(arr[i]&255);
 	env->ReleaseCharArrayElements(imgArray,arr, 0);			
-	//env->GetCharArrayRegion(imgArray, start, size, imgbuf);
 
 	simxInt retVal = simxSetVisionSensorImage(theClientID,sensorHandle,  (simxUChar*)imgbuf, bufferSize, options, operationMode);
 	delete[] imgbuf; 
@@ -5096,6 +5106,25 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetDistanceHandle(JNIEnv *env
 }
 
 
+JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetCollectionHandle(JNIEnv *env, jobject obj, jint clientID, jstring con, jobject hdl, jint opMode)
+{
+	simxInt theClientID = clientID;
+	const simxChar *collectionName = (simxChar*)env->GetStringUTFChars(con, 0);
+	simxInt handle;
+	simxInt operationMode = opMode;
+
+	simxInt retVal = simxGetCollectionHandle(theClientID,collectionName, &handle, operationMode);
+
+	env->ReleaseStringUTFChars(con,collectionName);
+
+	jclass cls = env->GetObjectClass(hdl);
+	jmethodID mid = env->GetMethodID(cls, "setValue", "(I)V");
+	env->CallVoidMethod( hdl, mid, handle);
+
+	return retVal;
+}
+
+
 JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxReadCollision(JNIEnv *env, jobject obj, jint clientID, jint hdl, jobject cs, jint opMode)
 {
 	simxInt theClientID = clientID;
@@ -5376,16 +5405,13 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetStringSignal(JNIEnv *env, 
 
 	if (retVal==0)
 	{
-		if (signalLength>0)
-		{
-			jclass cls = env->GetObjectClass(sv);
-			jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
-			jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
-			jchar* arr=env->GetCharArrayElements(s,0);
-			for (jsize i=0;i<signalLength;i++)
-				arr[i]=(unsigned char)signalValue[i];
-			env->ReleaseCharArrayElements(s,arr, 0);			
-		}
+		jclass cls = env->GetObjectClass(sv);
+		jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
+		jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
+		jchar* arr=env->GetCharArrayElements(s,0);
+		for (jsize i=0;i<signalLength;i++)
+			arr[i]=(unsigned char)signalValue[i];
+		env->ReleaseCharArrayElements(s,arr, 0);			
 	}
 	env->ReleaseStringUTFChars(sn,signalName);
 
@@ -5405,16 +5431,13 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetAndClearStringSignal(JNIEn
 
 	if (retVal==0)
 	{
-		if (signalLength>0)
-		{
-			jclass cls = env->GetObjectClass(sv);
-			jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
-			jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
-			jchar* arr=env->GetCharArrayElements(s,0);
-			for (jsize i=0;i<signalLength;i++)
-				arr[i]=(unsigned char)signalValue[i];
-			env->ReleaseCharArrayElements(s,arr, 0);			
-		}
+		jclass cls = env->GetObjectClass(sv);
+		jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
+		jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
+		jchar* arr=env->GetCharArrayElements(s,0);
+		for (jsize i=0;i<signalLength;i++)
+			arr[i]=(unsigned char)signalValue[i];
+		env->ReleaseCharArrayElements(s,arr, 0);			
 	}
 	env->ReleaseStringUTFChars(sn,signalName);
 
@@ -5434,16 +5457,13 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxReadStringStream(JNIEnv *env,
 
 	if (retVal==0)
 	{
-		if (signalLength>0)
-		{
-			jclass cls = env->GetObjectClass(sv);
-			jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
-			jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
-			jchar* arr=env->GetCharArrayElements(s,0);
-			for (jsize i=0;i<signalLength;i++)
-				arr[i]=(unsigned char)signalValue[i];
-			env->ReleaseCharArrayElements(s,arr, 0);			
-		}
+		jclass cls = env->GetObjectClass(sv);
+		jmethodID mid = env->GetMethodID(cls, "getNewArray", "(I)[C");
+		jcharArray s = (jcharArray)env->CallObjectMethod(sv, mid, signalLength);
+		jchar* arr=env->GetCharArrayElements(s,0);
+		for (jsize i=0;i<signalLength;i++)
+			arr[i]=(unsigned char)signalValue[i];
+		env->ReleaseCharArrayElements(s,arr, 0);			
 	}
 	env->ReleaseStringUTFChars(sn,signalName);
 
@@ -5693,16 +5713,13 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxQuery(JNIEnv *env, jobject ob
 
 	if (retVal==0)
 	{
-		if (retSignalLength>0)
-		{
-			jclass cls2 = env->GetObjectClass(rsv);
-			jmethodID mid3 = env->GetMethodID(cls2, "getNewArray", "(I)[C");
-			jcharArray s = (jcharArray)env->CallObjectMethod(rsv, mid3, retSignalLength);
-			jchar* arr=env->GetCharArrayElements(s,0);
-			for (jsize i=0;i<retSignalLength;i++)
-				arr[i]=(unsigned char)retSignalValue[i];
-			env->ReleaseCharArrayElements(s,arr, 0);			
-		}
+		jclass cls2 = env->GetObjectClass(rsv);
+		jmethodID mid3 = env->GetMethodID(cls2, "getNewArray", "(I)[C");
+		jcharArray s = (jcharArray)env->CallObjectMethod(rsv, mid3, retSignalLength);
+		jchar* arr=env->GetCharArrayElements(s,0);
+		for (jsize i=0;i<retSignalLength;i++)
+			arr[i]=(unsigned char)retSignalValue[i];
+		env->ReleaseCharArrayElements(s,arr, 0);			
 	}
 
 	env->ReleaseStringUTFChars( sn,signalName);
@@ -5713,8 +5730,6 @@ JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxQuery(JNIEnv *env, jobject ob
 JNIEXPORT jint JNICALL Java_coppelia_remoteApi_simxGetObjectGroupData(JNIEnv *env, jobject obj, jint clientID, jint objectType, jint dataType, jobject handles, jobject intData, jobject floatData, jobject stringData, jint operationMode)
 {
 	simxInt theClientID = clientID;
-//	simxInt theObjectType = objectType;
-//	simxInt theDataType = dataType;
 	simxInt theHandleCount;
 	simxInt theIntDataCount;
 	simxInt theFloatDataCount;

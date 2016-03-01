@@ -1,6 +1,6 @@
 // This file is part of the REMOTE API
 // 
-// Copyright 2006-2014 Coppelia Robotics GmbH. All rights reserved. 
+// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
 // marc@coppeliarobotics.com
 // www.coppeliarobotics.com
 // 
@@ -24,7 +24,7 @@
 // along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.1.3 on Sept. 30th 2014
+// This file was automatically created for V-REP release V3.2.3 rev4 on December 21st 2015
 
 #include "extApiPlatform.h"
 #include <stdio.h>
@@ -473,8 +473,8 @@ simxUChar extApi_launchThread(SIMX_THREAD_RET_TYPE(*startAddress)(simxVoid*))
 
 simxUChar extApi_connectToServer_socket(simxInt clientID,const simxChar* theConnectionAddress,simxInt theConnectionPort)
 { /* return 1: success */
-	struct hostent *hp;
-	simxUInt addr;
+	/* struct hostent *hp;
+	simxUInt addr; */
 #ifdef _WIN32
 	if (WSAStartup(0x101,&_socketWsaData)!=0)
 		return(0);
@@ -487,6 +487,8 @@ simxUChar extApi_connectToServer_socket(simxInt clientID,const simxChar* theConn
 #endif
 		return(0);
 	}
+	/*
+	Following code can be problematic since some IP Addresses can't be resolved:
 	if (inet_addr(theConnectionAddress)==INADDR_NONE)
 		hp=gethostbyname(theConnectionAddress);
 	else
@@ -505,6 +507,13 @@ simxUChar extApi_connectToServer_socket(simxInt clientID,const simxChar* theConn
 		return(0);
 	}
 	_socketServer[clientID].sin_addr.s_addr=*((unsigned long*)hp->h_addr);
+	*/
+
+	/* Above code replaced with: */
+	_socketServer[clientID].sin_addr.s_addr=inet_addr(theConnectionAddress);
+
+
+
 	_socketServer[clientID].sin_family=AF_INET;
 	_socketServer[clientID].sin_port=htons(theConnectionPort);
 	if(connect(_socketConn[clientID],(struct sockaddr*)&_socketServer[clientID],sizeof(_socketServer[clientID])))

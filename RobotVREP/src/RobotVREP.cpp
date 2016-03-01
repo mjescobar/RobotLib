@@ -3,17 +3,62 @@
 
 
 
-RobotVREP::RobotVREP()
+void RobotVREP::trackConnection()
 {
-	vrep_error.open("error_files/vrep_error.txt");
+	int aux_clientID = simxGetConnectionId(clientID);
+
+	if (aux_clientID == -1)
+	{
+		clog << "ERROR: The client is not connected to VREP. The program ends" << endl;
+		delete this;
+		exit(EXIT_FAILURE);
+	}
+	else if (aux_clientID != clientID)
+		clog << "WARNING: Exist temporary disconections in-between" << endl;
 }
 
-RobotVREP::~RobotVREP()
+void RobotVREP::setVideoRecordingMode(bool active)
 {
-	vrep_error.close();
+	int error;	
+
+	if(active)
+	{		
+		char * aux_old_path;
+		int aux_old_path_len;
+
+		error = simxGetStringParameter(clientID, sim_stringparam_video_filename, (simxChar**)&aux_old_path,simx_opmode_oneshot_wait);
+		if(error != 0) vrep_error << "simxGetStringParameter: " << error << endl;		
+
+		aux_old_path_len = strlen(aux_old_path)+1;
+		old_path = new char[aux_old_path_len];
+		strncpy(old_path, aux_old_path, aux_old_path_len);
+
+		char * response;
+		int responselen;
+
+		error = simxGetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar**)&response, (simxInt*)&responselen,simx_opmode_streaming);
+		if(error != 0) vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
+
+		video_recording_flag = active;
+	}
+	else if(video_recording_flag)
+	{
+		int error = simxSetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar*)old_path, (simxInt)(strlen(old_path)+1), simx_opmode_oneshot);
+		if(error != 0) vrep_error << "simxSetStringSignal: videoPath - " << error << endl;
+
+		video_recording_flag = false;
+	}
+
+	error = simxSetBooleanParameter(clientID, sim_boolparam_video_recording_triggered, active, simx_opmode_oneshot);
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_video_recording_triggered" << error << endl;
+	error = simxSetBooleanParameter(clientID, sim_boolparam_browser_visible,!active, simx_opmode_oneshot);
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_browser_visible" << error << endl;
+	error = simxSetBooleanParameter(clientID, sim_boolparam_hierarchy_visible,!active, simx_opmode_oneshot);
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_hierarchy_visible" << error << endl;
+
 }
 
-void RobotVREP::simStart()
+RobotVREP::RobotVREP(bool video_recording)
 {
 	clientID = simxStart((simxChar*)"127.0.0.1",PORTNB,true,true,2000,5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -22,9 +67,15 @@ void RobotVREP::simStart()
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
+
+	simulation_in_progress = false;
+
+	setVideoRecordingMode(video_recording);
 }
 
-void RobotVREP::simStart(const char * ip)
+RobotVREP::RobotVREP(const char * ip, bool video_recording)
 {
 	clientID = simxStart((simxChar*)ip, PORTNB, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -33,20 +84,15 @@ void RobotVREP::simStart(const char * ip)
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
+
+	simulation_in_progress = false;
+
+	setVideoRecordingMode(video_recording);
 }
 
-void RobotVREP::simStart(const char * ip, int port)
-{
-	clientID = simxStart((simxChar*)ip, port, true, true, 2000, 5);
-	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
-	else 
-	{
-		clog << "ERROR: The connection to VREP was not possible" << endl;
-		return;
-	}
-}
-
-void RobotVREP::simStart(int port)
+RobotVREP::RobotVREP(int port, bool video_recording)
 {
 	clientID = simxStart((simxChar*)"127.0.0.1", port, true, true, 2000, 5);
 	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
@@ -55,51 +101,84 @@ void RobotVREP::simStart(int port)
 		clog << "ERROR: The connection to VREP was not possible" << endl;
 		return;
 	}
+
+	vrep_error.open("error_files/vrep_error.txt");
+
+	simulation_in_progress = false;
+
+	setVideoRecordingMode(video_recording);
 }
 
-void RobotVREP::simFinish()
-{	
+RobotVREP::RobotVREP(const char * ip, int port, bool video_recording)
+{
+	clientID = simxStart((simxChar*)ip, port, true, true, 2000, 5);
+	if (clientID != -1) clog << "The connection has been successfully established with VREP" << endl;
+	else 
+	{
+		clog << "ERROR: The connection to VREP was not possible" << endl;
+		return;
+	}
+
+	vrep_error.open("error_files/vrep_error.txt");
+
+	simulation_in_progress = false;
+
+	setVideoRecordingMode(video_recording);
+}
+
+RobotVREP::~RobotVREP()
+{
+	if (video_recording_flag) setVideoRecordingMode(false);
+
 	simxFinish(clientID);
+
+	vrep_error.close();
 }
 
-int RobotVREP::simGetConnectionId()
+int RobotVREP::getConnectionId()
 {
 	return simxGetConnectionId(clientID);
 }
 
-void RobotVREP::simPauseCommunication(int action)
+void RobotVREP::pauseCommunication(int action)
 {
 	simxPauseCommunication(clientID, action);
 }
 
-void RobotVREP::simStartSimulation(simxInt operationMode)
+void RobotVREP::startSimulation(simxInt operationMode)
 {
+	trackConnection();
+
 	int error = simxStartSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << " try 1 simxStartSimulation : " << error << endl;
 	else
 	{
 		error = simxStartSimulation(clientID, operationMode);	
 		if(error != 0) vrep_error << "try 2 simxStartSimulation : " << error << endl;
-	} 	
+	} 
+
+	if(error == 0) simulation_in_progress = true;	
 
 	usleep(100000);
 }
 
-void RobotVREP::simStopSimulation(simxInt operationMode)
+void RobotVREP::stopSimulation(simxInt operationMode)
 {
 	int error = simxStopSimulation(clientID, operationMode);
 	if(error != 0) vrep_error << "simxStopSimulation : " << error << endl;
 
+	if(error == 0) simulation_in_progress = false;
+
 	usleep(100000);
 }
 
-void RobotVREP::simGetObjectHandle(char name[], int * handle, simxInt operationMode)
+void RobotVREP::getObjectHandle(char name[], int * handle, simxInt operationMode)
 {
 	int error = simxGetObjectHandle(clientID, name, handle, operationMode);	
 	if(error != 0) vrep_error << "simxGetObjectHandle - " << name << " : "<< error << endl;
 }
 
-void RobotVREP::simGetObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
+void RobotVREP::getObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -110,7 +189,7 @@ void RobotVREP::simGetObjectPosition(int object_handle, int relativeTo, double *
 		position[i] = (double)aux[i];
 }
 
-void RobotVREP::simGetObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
+void RobotVREP::getObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
 {
 	float * lVel = new float[3];
 	float * aVel = new float[3];
@@ -132,7 +211,7 @@ void RobotVREP::simGetObjectVelocity(int object_handle, double * lVelocity, doub
 	}	
 }
 
-void RobotVREP::simGetObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
+void RobotVREP::getObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
 {
 	float * aux = new float[3];
 
@@ -143,7 +222,7 @@ void RobotVREP::simGetObjectOrientation(int object_handle, int relativeTo, doubl
 		orientation[i] = (double)aux[i];
 }
 
-double RobotVREP::simGetJointPosition(int object_handle, simxInt operationMode)
+double RobotVREP::getJointPosition(int object_handle, simxInt operationMode)
 {
 	float joint_pos;
 
@@ -153,13 +232,13 @@ double RobotVREP::simGetJointPosition(int object_handle, simxInt operationMode)
 	return (double)joint_pos;
 }
 
-void RobotVREP::simSetJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
+void RobotVREP::setJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
 {
 	int error = simxSetJointTargetPosition(clientID, object_handle, (float)joint_pos, operationMode);
 	if(error != 0) vrep_error << "simxSetJointTargetPosition - " << object_handle << " : "<< error << endl;	
 }
 
-double RobotVREP::simGetJointForce(int object_handle, simxInt operationMode)
+double RobotVREP::getJointForce(int object_handle, simxInt operationMode)
 {
 	float force;
 
@@ -169,13 +248,13 @@ double RobotVREP::simGetJointForce(int object_handle, simxInt operationMode)
 	return (double)force;
 }
 
-void RobotVREP::simAddStatusbarMessage(char * message, simxInt operationMode)
+void RobotVREP::addStatusbarMessage(char * message, simxInt operationMode)
 {
 	int error = simxAddStatusbarMessage(clientID,(char*)message, operationMode);	
 	if(error != 0) vrep_error << "simxAddStatusbarMessage - " << message << " : " << error << endl;
 } 
 
-void RobotVREP::simReadCollision(int collisionHandle, int * collisionState, simxInt operationMode)
+void RobotVREP::readCollision(int collisionHandle, int * collisionState, simxInt operationMode)
 {
 	unsigned char * aux = (unsigned char*)malloc(sizeof(unsigned char)*100);
 	int error = simxReadCollision(clientID, collisionHandle, aux, operationMode);
@@ -184,8 +263,40 @@ void RobotVREP::simReadCollision(int collisionHandle, int * collisionState, simx
 	free(aux);
 }
 
-void RobotVREP::simGetCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
+void RobotVREP::getCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
 {
 	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
 	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;
 }
+
+
+void RobotVREP::changeVideoPath(char path[], simxInt operationMode)
+{	
+	if(!simulation_in_progress)
+	{
+		int pathlen = strlen(path)+1;
+
+		int error = simxSetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar*)path, (simxInt)pathlen, operationMode);
+		if(error != 0) vrep_error << "simxSetStringSignal: videoPath - " << error << endl;
+
+		char * response;
+		int responselen;
+
+		do
+		{	
+			usleep(100000);
+
+			int error = simxGetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar**)&response, (simxInt*)&responselen,simx_opmode_buffer);
+			if(error != 0) vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
+		}
+		while(responselen == pathlen);
+
+		if (!video_recording_flag) clog << "WARNING: The video recording mode is not active." << endl;
+	}
+	else
+		clog << "ERROR: This function can only be used if the simulator is stopped." << endl;
+		
+		
+}
+
+
