@@ -1,9 +1,9 @@
 CC = gcc
 CXX = g++
-VPATH = ./src ./headers ./include ./remoteApi ../objects/src ../objects/headers ../robotCM700/src ../robotCM700/headers
+VPATH = ./src ./headers ./include ./remoteApi ../robotObjects/src ../robotObjects/headers ../DynamixelMotors/src ../DynamixelMotors/headers
 CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 CFLAGS_EXT = -g -Wall -I./src -I./headers 
-CFLAGS_EXT_2 = -I../objects/src -I../objects/headers -I../robotCM700/src -I../robotCM700/headers
+CFLAGS_EXT_2 = -I../robotObjects/src -I../robotObjects/headers -I../DynamixelMotors/src -I../DynamixelMotors/headers
 LDFLAGS = -lpthread
 
 OS = $(shell uname -s)
@@ -49,7 +49,7 @@ clean:
 	@rm -f -R ./objects
 
 prueba: ./src/prueba.cpp
-	$(CXX) $(CFLAGS_EXT_2) $(CFLAGS_EXT) $(CFLAGS) ./src/prueba.cpp ./objects/RobotVREP.o ./objects/extApi.o ./objects/extApiPlatform.o ../objects/objects/Object.o ../objects/objects/Joint.o ../robotCM700/objects/cm700.o ../robotCM700/objects/serial.o ../robotCM700/objects/dynamixel.o ../robotCM700/objects/dxl_hal.o -o prueba $(LDFLAGS)
+	$(CXX) $(CFLAGS_EXT_2) $(CFLAGS_EXT) $(CFLAGS) ./src/prueba.cpp ./objects/RobotVREP.o ./objects/extApi.o ./objects/extApiPlatform.o ../robotObjects/objects/Object.o ../robotObjects/objects/Joint.o ../DynamixelMotors/objects/cm700.o ../DynamixelMotors/objects/serial.o ../DynamixelMotors/objects/dynamixel.o ../DynamixelMotors/objects/dxl_hal.o -o prueba $(LDFLAGS)
 
 cleanprueba:
 	@rm -f prueba

@@ -7,13 +7,13 @@
 #include <unistd.h>
 #include <string.h>
 
-
+using namespace std;
 
 extern "C" {
     #include "extApi.h"
 }
 
-#define  19997
+#define PORTNB 19997
 
 
 /**
