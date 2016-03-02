@@ -1,16 +1,12 @@
 CC = g++ -O3
 VPATH = ./src ./headers 
-CFLAGS = -g -Wall -fPIC -I../remoteApi -I../include -I./src -I./headers -I./objects -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
+CFLAGS = -g -Wall -fPIC -I../RobotVREP/remoteApi -I../RobotVREP/include -I./src -I./headers -I./objects -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 EXTFLAGS = -I../RobotVREP/headers -I../DynamixelMotors/headers
 
 LDFLAGS = -lpthread
 
-all: Object.o Joint.o CollisionObject.o 
+all: Joint.o CollisionObject.o 
 
-Object.o: Object.cpp 
-	@mkdir -p objects 
-	@echo "Compiling Object.cpp to Object.o"
-	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/Object.cpp -o ./objects/Object.o
 
 Joint.o: Joint.cpp 
 	@mkdir -p objects 

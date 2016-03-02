@@ -1,11 +1,17 @@
 #ifndef ROBOTVREP_HPP
 #define ROBOTVREP_HPP
 
+class Joint;
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <string.h>
+
+#include <map>
+#include <vector>
+#include <algorithm>    // std::find
 
 using namespace std;
 
@@ -37,6 +43,12 @@ class RobotVREP
 	bool simulation_in_progress;
 	// Old video recording path
 	char * old_path;
+	// The vector of all joints that are controlled by this Vrep Simulator.
+	std::vector < Joint * > jointVector;
+	// the handler of all object for VrepApi
+	std::vector < int * > VrepHandlerVector;
+	// the mapping from JointUniqueId to Vrep Handler Vector corresponding position.
+	std::map <int , int  > 	jointIdToVrepHandler_map;
 
 public:
 	/**
@@ -179,6 +191,17 @@ public:
 	 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot if the argument is not passed.
 	 */
 	void changeVideoPath(char path[], simxInt operationMode = /*simx_opmode_oneshot*/ 0x000000);
+
+	/** 
+
+	*/
+	void addMotor ( Joint * joint, char name[] );
+
+
+	/**
+
+	*/
+	void move();
 };
 
 

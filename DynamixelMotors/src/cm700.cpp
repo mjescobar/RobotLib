@@ -14,10 +14,13 @@ CM700::~CM700()
 	free(serial_name);
 } 
 
-void CM700::addMotor(int id)
+void CM700::addMotor(Joint * joint, int id)
 {
 
-	//Verifing that the id is unique
+	cerr << "Not working" << endl;
+	exit(EXIT_FAILURE);
+
+/*	//Verifing that the id is unique
 	if( idToMotorsVectorPosition_map.find( id ) != idToMotorsVectorPosition_map.end() )
 	{
 		//The Id already exist
@@ -25,6 +28,7 @@ void CM700::addMotor(int id)
 		exit (EXIT_FAILURE);
 	}
 
+	this->joint = joint;
 	Motor motor;
 	motor.id=id;
 	// Obtaining information about the motor throught consulting the dynamixel motor connected with the corresponding id.
@@ -40,15 +44,16 @@ void CM700::addMotor(int id)
 	}
 
 	//Settings motors values from model.
-	setMotorParametersFromModel( model, motor);
+	setParametersFromModel( model, motor);
 
 	// Adding the motor
 	motors.push_back( motor );
 	idToMotorsVectorPosition_map.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
+*/
 }
 
 //We try to obtain the most information posible to create the motor throught the motor model number, if is not in our registers then is necesary to use the other constructor.
-void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg)
+void CM700::addMotor(Joint * joint, int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg)
 {
 	//Verifing that the id is unique
 	if( idToMotorsVectorPosition_map.find( id ) != idToMotorsVectorPosition_map.end() )
@@ -58,8 +63,11 @@ void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int vel
 		exit (EXIT_FAILURE);
 	}
 
+	this->jointVector.push_back(joint);
+
 	Motor motor;
 	motor.id = id;
+	motor.jointId =  joint->getUniqueJointId();
 
 	//Settings motors values from model.
 	motor.angleResolution = angleResolution;
@@ -70,77 +78,21 @@ void CM700::addMotor(int id, int angleResolution, bool hasCurrentSensor, int vel
 	// Adding the motor
 	motors.push_back( motor );
 	idToMotorsVectorPosition_map.insert ( std::pair<int,int> ( id, motors.size() -1 ) );
+	jointIdToId_map.insert( std::pair<int,int> ( motor.jointId , motor.id  ) );
 }
-
-void USB2Dynamixel::setNextMotorAngle(int id, double angle_RAD, double normalizedVelocity)
-{
-	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
-	{
-		//The Id already exist
-		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
-		exit (EXIT_FAILURE);
-	}
-
-	int motorVectorPosition = idToMotorsVectorPosition_map.at( id );
-
-	// if angle_RAD is no in 0-2Pi then is important to convert that.
-	while(angle_RAD >= M_PI || angle_RAD <= -M_PI)
-	{
-		if( angle_RAD < -M_PI )
-		{
-			angle_RAD += 2*M_PI;
-		}
-		else
-		{
-			angle_RAD -= 2*M_PI;
-		}
-	}
-
-	//Cheking inpuit are coherent.
-	if(normalizedVelocity > 1 || normalizedVelocity < 0 )
-	{
-		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::normalizedVelocity must be in [0,1]" <<  std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if ( fabs(angle_RAD) >= motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0) ) 
-	{
-		std::cerr << "ERROR::USB2Dynamixel::setMotorPosition::angle_RAD is not in the phisical angle range of the dynamixel motor" <<  std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-
-	// EACH MODEL COULD HAVE DIFERENT AMOUNT OF ANGLE RESOLUTION, THAT MEANS THAT A ANGLE IN RAD WILL BE A DIFERENT GOALPOSITION VALUE.
-
-	// the goal position have to be transformed taking in account that the value 0 is not in the mitdle but in one extreme (the midle is in the angleResolution/2) and that the dynamizel could have a range of degress and not always 360 degrees
-	double resolution =  motors.at( motorVectorPosition ).angleResolution ;
-	double range = 	motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0);
-	int goalPosition = (int)(resolution/2.0 + (resolution*angle_RAD)/range); // position = resolution/2 -> angle = 0;; position = 0 -> angle = -range/2 (creating the line is obtained the equation)
-	// the speed is scaled because for convention is normalized then 0 is the minimum and 1 is the max value.
-	int speed = (int)( normalizedVelocity * motors.at(motorVectorPosition).velocityResolution);
-	motors.at( motorVectorPosition ).tposition = goalPosition;
-	motors.at( motorVectorPosition ).tspeed = speed;
-
-
-	// Now it is placed within a vector of motor that will be moved in le next move() call.
-	// take in account that if is in that vector then is no necesary put it aggain
-	std::vector<int>::iterator it;
-	it = find (idMotorsWithNewPosition_Vect.begin(), idMotorsWithNewPosition_Vect.end(), id);
-	if (it == idMotorsWithNewPosition_Vect.end())
-	{
-		idMotorsWithNewPosition_Vect.push_back( id ); // Only if is not in the vector this line occur
-	}
-}
-
 
 // right now the position is not in rad.
-double CM700::getMotorAngle( int id ) 
+double CM700::getAngle( int jointId ) 
 {
+	int id = jointIdToId_map.at( jointId );
+
+
 	if( idToMotorsVectorPosition_map.find( id ) == idToMotorsVectorPosition_map.end() )
 	{
-		//The Id already exist
 		std::cerr << "ERROR::CM700::getMotorPosition::The id is not in the current memory, you have to add the Id before to call this method." << std::endl;
 		exit (EXIT_FAILURE);
 	}
+
 	auto motorVectorPosition = idToMotorsVectorPosition_map.at( id );
 	int position = motors.at(motorVectorPosition).cposition;
 	double resolution =  motors.at( motorVectorPosition ).angleResolution ;
@@ -206,16 +158,31 @@ void CM700::move()
 	buffer_out[1] = SETPOSNDVEL;
 	buffer_out[2] = motors.size();
 
-	for (unsigned int i = 0; i < motors.size(); i++) {
-		buffer_out[5 * i + 3] = 254 - motors.at(i).id;
-		buffer_out[5 * i + 4] = _L16(motors.at(i).tposition);
-		buffer_out[5 * i + 5] = _H16(motors.at(i).tposition);
-		buffer_out[5 * i + 6] = _L16(motors.at(i).tspeed);
-		buffer_out[5 * i + 7] = _H16(motors.at(i).tspeed);
+	for (unsigned int i = 0; i < jointVector.size(); i++) {
+
+
+		int motorId = jointVector.at(i)->getUniqueJointId();
+		int motorVectorPosition = idToMotorsVectorPosition_map.at(motorId);
+		double angle_RAD = jointVector.at(i)->getNextPositionRad();
+
+
+		buffer_out[5 * i + 3] = 254 - motorId; // motor id
+
+		// the goal position have to be transformed taking in account that the value 0 is not in the mitdle but in one extreme (the midle is in the angleResolution/2) and that the dynamizel could have a range of degress and not always 360 degrees
+		double resolution =  motors.at( motorVectorPosition ).angleResolution ;
+		double range = 	motors.at( motorVectorPosition ).angleRangeDeg*(M_PI/180.0);
+		int goalPosition = (int)(resolution/2.0 + (resolution*angle_RAD)/range); // position = resolution/2 -> angle = 0;; position = 0 -> angle = -range/2 (creating the line is obtained the equation)
+
+		buffer_out[5 * i + 4] = _L16( goalPosition );
+		buffer_out[5 * i + 5] = _H16( goalPosition );
+		// buffer_out[5 * i + 6] = _L16(motors.at(i).tspeed);
+		// buffer_out[5 * i + 7] = _H16(motors.at(i).tspeed);
+		buffer_out[5 * i + 6] = _L16(500); // I think that speed is not used.
+		buffer_out[5 * i + 7] = _H16(500);
 	}
 
 	serial_io_flush(fd);
-	serial_send(fd, buffer_out, 5 * motors.size() + 3);
+	serial_send(fd, buffer_out, 5 * jointVector.size() + 3);
 
 }
 
@@ -234,7 +201,7 @@ bool CM700::verifyModel ( int model )
 } 
 
 
-void CM700::setMotorParametersFromModel (int model, Motor & motor)
+void CM700::setParametersFromModel (int model, Motor & motor)
 {	
 	if(model == AX12)
 	{

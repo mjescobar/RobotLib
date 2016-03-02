@@ -10,6 +10,7 @@ enum Models
 struct Motor 
 {
 	int id;
+	int jointId;
 	int cposition;
 	int tposition;
 	int cspeed;

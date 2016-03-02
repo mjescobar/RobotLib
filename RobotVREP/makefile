@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
-VPATH = ./src ./headers ./include ./remoteApi ../robotObjects/src ../robotObjects/headers ../DynamixelMotors/src ../DynamixelMotors/headers
-CFLAGS = -fPIC -I./remoteApi -I./include -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
+VPATH = ./src ./headers ./include ./remoteApi ../robotObjects/src ../robotObjects/headers ../DynamixelMotors/src ../DynamixelMotors/headers 
+CFLAGS = -fPIC -I./remoteApi -I./include -I./headers -I../robotObjects/headers -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 CFLAGS_EXT = -g -Wall -I./src -I./headers 
 CFLAGS_EXT_2 = -I../robotObjects/src -I../robotObjects/headers -I../DynamixelMotors/src -I../DynamixelMotors/headers
 LDFLAGS = -lpthread
@@ -33,17 +33,30 @@ SDIR1=src
 SDIR2=remoteApi
 
 
-all: $(OBJS)
+all: RobotVREP.o extApi.o extApiPlatform.o
 
-$(ODIR)/%.o: $(SDIR1)/%.cpp $(DEPS1) $(DEPS2) $(DEPS3)
-	@mkdir -p objects 
-	@echo "Compiling $< to $@"
-	$(CXX) $(CFLAGS_EXT) $(CFLAGS) -c $< -o $@
+# $(ODIR)/%.o: $(SDIR1)/%.cpp $(DEPS1) $(DEPS2) $(DEPS3)
+# 	@mkdir -p objects 
+# 	@echo "Compiling $< to $@"
+# 	$(CXX) $(CFLAGS_EXT) $(CFLAGS) -c $< -o $@
 
-$(ODIR)/%.o: $(SDIR2)/%.c $(DEPS2) $(DEPS3)
-	@mkdir -p objects 
-	@echo "Compiling $< to $@" 
-	$(CC) $(CFLAGS) -c $< -o $@
+RobotVREP.o: RobotVREP.hpp RobotVREP.cpp 
+	@mkdir -p objects
+	$(CXX) $(CFLAGS_EXT) $(CFLAGS) -c ./src/RobotVREP.cpp -o ./objects/RobotVREP.o
+
+
+# $(ODIR)/%.o: $(SDIR2)/%.c $(DEPS2) $(DEPS3)
+# 	@mkdir -p objects 
+# 	@echo "Compiling $< to $@" 
+# 	$(CC) $(CFLAGS) -c $< -o $@
+
+extApiPlatform.o: extApiPlatform.c extApiPlatform.h
+	@mkdir -p objects
+	$(CC) $(CFLAGS) -c ./remoteApi/extApiPlatform.c -o ./objects/extApiPlatform.o
+
+extApi.o: extApi.c extApi.h
+	@mkdir -p objects
+	$(CC) $(CFLAGS) -c ./remoteApi/extApi.c -o ./objects/extApi.o
 
 clean:
 	@rm -f -R ./objects

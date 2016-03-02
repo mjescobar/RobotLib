@@ -1,6 +1,7 @@
 #ifndef CM700_HPP
 #define CM700_HPP
 
+#include "Joint.hpp"
 #include "usb2dynamixel.h"
 #include "serial.h"
 #include "motor.h"
@@ -19,6 +20,7 @@
 #include <algorithm>    // std::find
 #include "dynamixelMotor.hpp"
 
+
 using namespace std;
 
 class CM700 : public DynamixelMotor
@@ -29,22 +31,23 @@ class CM700 : public DynamixelMotor
 	string 					serialPort;
 	std::vector < Motor > 	motors;
 	std::map <int , int  > 	idToMotorsVectorPosition_map;
+	std::map <int , int  > 	jointIdToId_map;
 	std::vector < int > 	idMotorsWithNewPosition_Vect;
 	char * serial_name;
-
+	std::vector < Joint * > jointVector;
 public:	
 	CM700 (string serialPort, speed_t baudrate);
 	~CM700(); 
-	void addMotor(int id);
-	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
-	double getMotorAngle(int id);
+	void addMotor(Joint * joint, int id);
+	void addMotor(Joint * joint, int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
+	double getAngle(int id);
 	void refreshAll();
 	void move();
 	void setTorque(bool enable);
 	void printValues();
 	bool verifyModel(int model);
-	void setMotorParametersFromModel(int model, Motor &motor);	
-	void setNextMotorAngle(int id, double angle_RAD, double velocity);
+	void setParametersFromModel(int model, Motor &motor);	
+	//void setNextAngle(int id, double angle_RAD, double velocity);
 
 };
 

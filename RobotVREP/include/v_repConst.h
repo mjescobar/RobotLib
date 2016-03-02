@@ -1,6 +1,6 @@
 // This file is part of V-REP, the Virtual Robot Experimentation Platform.
 // 
-// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
+// Copyright 2006-2016 Coppelia Robotics GmbH. All rights reserved. 
 // marc@coppeliarobotics.com
 // www.coppeliarobotics.com
 // 
@@ -27,16 +27,16 @@
 // along with V-REP.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.2.3 rev4 on December 21st 2015
+// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
 
 #if !defined(V_REPCONST_INCLUDED_)
 #define V_REPCONST_INCLUDED_
 
-#define VREP_PROGRAM_VERSION_NB 30203
-#define VREP_PROGRAM_VERSION "3.2.3."
+#define VREP_PROGRAM_VERSION_NB 30300
+#define VREP_PROGRAM_VERSION "3.3.0."
 
-#define VREP_PROGRAM_REVISION_NB 4
-#define VREP_PROGRAM_REVISION "(rev. 4)"
+#define VREP_PROGRAM_REVISION_NB 1
+#define VREP_PROGRAM_REVISION "(rev. 1)"
 
 /* Scene object types. Values are serialized */
 enum { 
@@ -310,7 +310,7 @@ enum {
 		sim_displayattribute_colorcodedpickpass	=0x1000,
 		sim_displayattribute_colorcoded			=0x2000,
 		sim_displayattribute_trianglewireframe	=0x4000, 
-		sim_displayattribute_simplifyasboundingbox	=0x8000,
+		sim_displayattribute_inertiaonly		=0x8000,
 		sim_displayattribute_thickEdges				=0x10000,
 		sim_displayattribute_dynamiccontentonly		=0x20000,
 		sim_displayattribute_mirror					=0x40000,
@@ -512,6 +512,7 @@ enum { /* special handle flags: */
 	sim_handleflag_assembly				=0x00400000,
 	sim_handleflag_togglevisibility		=0x00400000,
 	sim_handleflag_extended				=0x00400000,
+	sim_handleflag_greyscale			=0x00400000,
 	sim_handleflag_model				=0x00800000,
 	sim_handleflag_rawvalue				=0x01000000
 };
@@ -1177,7 +1178,7 @@ Remote API constants:
 /* version to 6 for release 3.1.2 */
 /* version to 7 for release 3.1.3 */
 /* version to 8 for release AFTER 3.1.3 */
-/* version to 10 for release AFTER 3.2.3. Added simxGetCollectionHandle */
+/* version to 10 for release AFTER 3.2.3. Added simxGetCollectionHandle and simxCallScriptFunction */
 
 /*
 Messages sent/received look like this:
@@ -1340,6 +1341,12 @@ enum {	simx_cmdnull_start				=0,
 		simx_cmd_read_string_stream,
 		simx_cmd_get_collection_handle,
 
+		simx_cmd4bytes2strings_start			=0x003400,
+		/* from here on, commands are also identified by 4 additional bytes and 2 additional strings */
+		simx_cmd_call_script_function,
+
+		simx_cmd4bytes2strings_end				=0x003500,
+
 		simx_cmd1string_custom_start	=0x003800,
 
 		simx_cmdreserved_start			=0x004000,
@@ -1348,7 +1355,8 @@ enum {	simx_cmdnull_start				=0,
 
 		/* Regular operation modes */
 		simx_opmode_oneshot				=0x000000,		/* sends command as one chunk. Reply will also come as one chunk. Doesn't wait for the reply. */
-		simx_opmode_oneshot_wait		=0x010000,		/* sends command as one chunk. Reply will also come as one chunk. Waits for the reply (_REPLY_WAIT_TIMEOUT_IN_MS is the timeout). */
+		simx_opmode_blocking			=0x010000,		/* sends command as one chunk. Reply will also come as one chunk. Waits for the reply (_REPLY_WAIT_TIMEOUT_IN_MS is the timeout). */
+		simx_opmode_oneshot_wait		=0x010000,		/* same as simx_opmode_blocking */
 		simx_opmode_streaming			=0x020000,		/* sends command as one chunk. Command will be stored on the server and always executed (every x ms (as far as possible), where x can be 0-65535. just add x to simx_opmode_streaming). A reply will be sent continuously, each time as one chunk. Doesn't wait for the reply. */
 		simx_opmode_continuous			=0x020000,		/* same as simx_opmode_streaming */
 
@@ -1366,7 +1374,7 @@ enum {	simx_cmdnull_start				=0,
 /* Command return codes (bit-coded) */
 enum {	simx_return_ok						=0x000000,
 		simx_return_novalue_flag			=0x000001,		/* input buffer doesn't contain the specified command. Maybe you forgot to enable data streaming, or streaming hasn't started yet */
-		simx_return_timeout_flag			=0x000002,		/* command reply not received in time for simx_opmode_oneshot_wait operation mode */
+		simx_return_timeout_flag			=0x000002,		/* command reply not received in time for simx_opmode_blocking operation mode */
 		simx_return_illegal_opmode_flag		=0x000004,		/* command doesn't support the specified operation mode */
 		simx_return_remote_error_flag		=0x000008,		/* command caused an error on the server side */
 		simx_return_split_progress_flag		=0x000010,		/* previous similar command not yet fully processed (applies to simx_opmode_oneshot_split operation modes) */
@@ -1489,8 +1497,10 @@ enum {	simros_strmcmdnull_start				=0,
 		simros_strmcmdintstring_start			=0x004000,
 		/* from here on, commands are also identified by one additional int and one additional string */
 		simros_strmcmd_get_twist_status,
+		simros_strmcmd_receive_data_from_script_function,
 
 		simros_strmcmdintstring_subscriber_start			=0x004800, 
+		simros_strmcmd_send_data_to_script_function,
 
 
 		simros_strmcmdreserved_start			=0x005000,

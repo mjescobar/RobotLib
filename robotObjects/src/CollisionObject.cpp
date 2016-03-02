@@ -9,9 +9,9 @@ CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
 	this->name = new char[size];
 	strncpy(this->name, name, size);
 	
-	simulator->simGetCollisionHandle(this->name, &collisionHandle, simx_opmode_oneshot_wait);
+	simulator->getCollisionHandle(this->name, &collisionHandle, simx_opmode_oneshot_wait);
 
-	simulator->simReadCollision(collisionHandle, &collisionState, simx_opmode_streaming);
+	simulator->readCollision(collisionHandle, &collisionState, simx_opmode_streaming);
 }
 
 CollisionObject::CollisionObject()
@@ -36,7 +36,6 @@ int CollisionObject::getCollisionHandle()
 
 int CollisionObject::getCollisionState()
 {
-	simulator->simReadCollision(collisionHandle, &collisionState, simx_opmode_streaming);
-	
+	simulator->readCollision(collisionHandle, &collisionState, simx_opmode_streaming);
 	return collisionState;
 }

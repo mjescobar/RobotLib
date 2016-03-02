@@ -1,6 +1,6 @@
 
 #include "RobotVREP.hpp"
-
+#include "Joint.hpp"
 
 
 void RobotVREP::trackConnection()
@@ -73,6 +73,7 @@ RobotVREP::RobotVREP(bool video_recording)
 	simulation_in_progress = false;
 
 	setVideoRecordingMode(video_recording);
+	startSimulation();
 }
 
 RobotVREP::RobotVREP(const char * ip, bool video_recording)
@@ -90,6 +91,7 @@ RobotVREP::RobotVREP(const char * ip, bool video_recording)
 	simulation_in_progress = false;
 
 	setVideoRecordingMode(video_recording);
+	startSimulation();
 }
 
 RobotVREP::RobotVREP(int port, bool video_recording)
@@ -107,6 +109,7 @@ RobotVREP::RobotVREP(int port, bool video_recording)
 	simulation_in_progress = false;
 
 	setVideoRecordingMode(video_recording);
+	startSimulation();
 }
 
 RobotVREP::RobotVREP(const char * ip, int port, bool video_recording)
@@ -124,11 +127,15 @@ RobotVREP::RobotVREP(const char * ip, int port, bool video_recording)
 	simulation_in_progress = false;
 
 	setVideoRecordingMode(video_recording);
+	startSimulation();
 }
 
 RobotVREP::~RobotVREP()
 {
-	if (video_recording_flag) setVideoRecordingMode(false);
+	if (video_recording_flag) 
+	{
+		setVideoRecordingMode(false);
+	}
 
 	simxFinish(clientID);
 
@@ -277,7 +284,10 @@ void RobotVREP::changeVideoPath(char path[], simxInt operationMode)
 		int pathlen = strlen(path)+1;
 
 		int error = simxSetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar*)path, (simxInt)pathlen, operationMode);
-		if(error != 0) vrep_error << "simxSetStringSignal: videoPath - " << error << endl;
+		if(error != 0) 
+		{
+			vrep_error << "simxSetStringSignal: videoPath - " << error << endl;
+		}
 
 		char * response;
 		int responselen;
@@ -287,16 +297,52 @@ void RobotVREP::changeVideoPath(char path[], simxInt operationMode)
 			usleep(100000);
 
 			int error = simxGetStringSignal(clientID, (simxChar*)"videoPath", (simxUChar**)&response, (simxInt*)&responselen,simx_opmode_buffer);
-			if(error != 0) vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
+			if(error != 0) 
+			{
+				vrep_error << "simxGetStringSignal: videoPath - " << error << endl;
+			}
 		}
 		while(responselen == pathlen);
 
-		if (!video_recording_flag) clog << "WARNING: The video recording mode is not active." << endl;
+		if (!video_recording_flag)
+		{
+		 	clog << "WARNING: The video recording mode is not active." << endl;
+		}
 	}
 	else
+	{
 		clog << "ERROR: This function can only be used if the simulator is stopped." << endl;
-		
-		
+	}
 }
 
 
+void RobotVREP::addMotor( Joint * joint, char name[] )
+{
+	int * handler = new int();
+	getObjectHandle(name, handler, simx_opmode_oneshot_wait);
+	VrepHandlerVector.push_back( handler );
+	jointVector.push_back( joint );
+	jointIdToVrepHandler_map.insert( std::pair<int,int> ( joint->getUniqueJointId() , VrepHandlerVector.size() -1 ) );
+}
+
+
+void RobotVREP::move()
+{
+	pauseCommunication(1);
+
+	if ( getConnectionId() == -1 )
+	{
+		cerr << "The connection with VREP fail" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	for (unsigned int i = 0; i < jointVector.size(); ++i)
+	{
+		int jointId = jointVector.at(i)->getUniqueJointId();
+		int * handler =  VrepHandlerVector.at( jointIdToVrepHandler_map.at( jointId ) );
+		double position = jointVector.at(i)->getNextPositionRad();
+		setJointTargetPosition( *handler, position, simx_opmode_oneshot);
+	}
+
+	pauseCommunication(0);
+}

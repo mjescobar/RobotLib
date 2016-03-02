@@ -1,6 +1,6 @@
 // This file is part of V-REP, the Virtual Robot Experimentation Platform.
 // 
-// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
+// Copyright 2006-2016 Coppelia Robotics GmbH. All rights reserved. 
 // marc@coppeliarobotics.com
 // www.coppeliarobotics.com
 // 
@@ -27,7 +27,7 @@
 // along with V-REP.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.2.3 rev4 on December 21st 2015
+// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
 
 // Use this header to dynamically load and bind v_rep.dll and its functions (call loadVrepLibrary and unloadVrepLibrary)
 
@@ -461,10 +461,14 @@ typedef simInt (__cdecl *ptrSimSaveImage)(const simUChar* image,const simInt* re
 typedef simInt (__cdecl *ptrSimGetQHull)(const simFloat* inVertices,simInt inVerticesL,simFloat** verticesOut,simInt* verticesOutL,simInt** indicesOut,simInt* indicesOutL,simInt reserved1,const simFloat* reserved2);
 typedef simInt (__cdecl *ptrSimGetDecimatedMesh)(const simFloat* inVertices,simInt inVerticesL,const simInt* inIndices,simInt inIndicesL,simFloat** verticesOut,simInt* verticesOutL,simInt** indicesOut,simInt* indicesOutL,simFloat decimationPercent,simInt reserved1,const simFloat* reserved2);
 typedef simInt (__cdecl *ptrSimExportIk)(const simChar* pathAndFilename,simInt reserved1,simVoid* reserved2);
-typedef simInt (__cdecl *ptrSimCallScriptFunction)(simInt scriptIdOrOptions,const simChar* functionName,SLuaCallBack* data,const simChar* scriptDescription);
-typedef simInt (__cdecl *ptrSimAppendScriptArrayEntry)(const simChar* scriptDescription,simInt options,const simChar* arrayName,const simChar* keyName,const simChar* data,const simInt* what);
-typedef simInt (__cdecl *ptrSimClearScriptVariable)(const simChar* scriptDescription,simInt options,const simChar* variableName);
+typedef simInt (__cdecl *ptrSimCallScriptFunction)(simInt scriptHandleOrType,const simChar* functionNameAtScriptName,SLuaCallBack* data,const simChar* reservedSetToNull);
+typedef simInt (__cdecl *ptrSimAppendScriptArrayEntry)(const simChar* reservedSetToNull,simInt scriptHandleOrType,const simChar* arrayNameAtScriptName,const simChar* keyName,const simChar* data,const simInt* what);
+typedef simInt (__cdecl *ptrSimClearScriptVariable)(const simChar* reservedSetToNull,simInt scriptHandleOrType,const simChar* variableNameAtScriptName);
 typedef simInt (__cdecl *ptrSimComputeJacobian)(simInt ikGroupHandle,simInt options,simVoid* reserved);
+typedef simInt (__cdecl *ptrSimGetConfigForTipPose)(simInt ikGroupHandle,simInt jointCnt,const simInt* jointHandles,simFloat thresholdDist,simInt maxTimeInMs,simFloat* retConfig,const simFloat* metric,simInt collisionPairCnt,const simInt* collisionPairs,const simInt* jointOptions,const simFloat* lowLimits,const simFloat* ranges,simVoid* reserved);
+typedef simFloat* (__cdecl *ptrSimGenerateIkPath)(simInt ikGroupHandle,simInt jointCnt,const simInt* jointHandles,simInt ptCnt,simInt collisionPairCnt,const simInt* collisionPairs,const simInt* jointOptions,simVoid* reserved);
+typedef simChar* (__cdecl *ptrSimGetExtensionString)(simInt objectHandle,simInt index,const char* key);
+typedef simInt (__cdecl *ptrSimComputeMassAndInertia)(simInt shapeHandle,simFloat density);
 
 
 typedef simInt (__cdecl *ptr_simGetContactCallbackCount)();
@@ -974,6 +978,10 @@ extern ptrSimCallScriptFunction simCallScriptFunction;
 extern ptrSimAppendScriptArrayEntry simAppendScriptArrayEntry;
 extern ptrSimClearScriptVariable simClearScriptVariable;
 extern ptrSimComputeJacobian simComputeJacobian;
+extern ptrSimGetConfigForTipPose simGetConfigForTipPose;
+extern ptrSimGenerateIkPath simGenerateIkPath;
+extern ptrSimGetExtensionString simGetExtensionString;
+extern ptrSimComputeMassAndInertia simComputeMassAndInertia;
 
 
 

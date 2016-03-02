@@ -58,30 +58,30 @@
 
 
 
-using namespace std;
+// using namespace std;
 
-class USB2Dynamixel : public DynamixelMotor
-{
-	int fd;
-	uint8_t buffer_in [ 255 ];
-	char buffer_out [ 255 ];
-	string serialPort;
-	std::vector <Motor> motors;
-	std::map <int , int  > idToMotorsVectorPosition_map;
-	std::vector < int > idMotorsWithNewPosition_Vect;
+// class USB2Dynamixel : public DynamixelMotor
+// {
+// 	int fd;
+// 	uint8_t buffer_in [ 255 ];
+// 	char buffer_out [ 255 ];
+// 	string serialPort;
+// 	std::vector <Motor> motors;
+// 	std::map <int , int  > idToMotorsVectorPosition_map;
+// 	std::vector < int > idMotorsWithNewPosition_Vect;
 
-public:	
-	USB2Dynamixel (string serialPort, int baudNum);
-	~USB2Dynamixel(); 
-	void addMotor(int id);
-	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
-	double getMotorAngle(int id);
-	void refreshAll();
-	void move();
-	void setTorque(bool enable);
-	void printValues();
-	bool verifyModel(int model);
-	void setMotorParametersFromModel(int model, Motor &motor);	
-	void setNextMotorAngle(int id, double angle_RAD, double velocity);
-};
+// public:	
+// 	USB2Dynamixel (string serialPort, int baudNum);
+// 	~USB2Dynamixel(); 
+// 	void addMotor(int id);
+// 	void addMotor(int id, int angleResolution, bool hasCurrentSensor, int velocityResolution, double angleRangeDeg);
+// 	double getAngle(int id);
+// 	void refreshAll();
+// 	void move();
+// 	void setTorque(bool enable);
+// 	void printValues();
+// 	bool verifyModel(int model);
+// 	void setParametersFromModel(int model, Motor &motor);	
+// 	void setNextAngle(int id, double angle_RAD, double velocity);
+// };
 #endif

@@ -1,6 +1,6 @@
 CC = g++ -O3 -std=c++11
-VPATH = ./src ./headers 
-CFLAGS = -g -Wall -fPIC -I./src -I./headers -I./objects -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
+VPATH = ./src ./headers ../robotObjects/headers ../robotObjects/src ../RobotVREP/remoteApi
+CFLAGS = -g -Wall -fPIC -I./src -I./headers -I./objects -I../robotObjects/headers -I../RobotVREP/headers -I../RobotVREP/remoteApi -I../RobotVREP/include -I../RobotVREP/objects -I../robotObjects/objects -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255
 LDFLAGS = -lpthread
 
 all: usb2dynamixel.o cm700.o serial.o dxl_hal.o dynamixel.o 

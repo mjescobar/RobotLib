@@ -1,9 +1,10 @@
 #ifndef JOINT_HPP
 #define JOINT_HPP
 
-#include "Object.hpp"
 #include <cstring>
 #include <cmath>
+#include "RobotVREP.hpp"
+//#include "cm700.h"
 
 #define RAD_CONV (double)(M_PI/180.0)
 #define PRECISION 6
@@ -33,7 +34,7 @@
  * \class Joint
  * \brief The joint class is inherited from the Object class and is used to interact with motors in an virtual environment of simulation named VREP or in real robots, more easily and transparently for the user.
  */
-class Joint : public Object
+class Joint
 {
 	// contein the current position of the motor and other two pass positions
 	double * positions;
@@ -87,6 +88,9 @@ class Joint : public Object
 	// The common values of all tipe of motor is initialized in this function.
 	void initParameters (double max_value, double min_value, const char * unit);
 
+
+	int uniqueJointId;
+
 public:
 
 	/**
@@ -98,19 +102,7 @@ public:
 	 * \param unit Unit used in the user workspace.
 	 * \param position Initial position asigned to the motor.
 	 */
-	Joint(RobotVREP * simulator, char name[], double max_value, double min_value, const char * unit);
-
-	/**
-	 * \brief Constructor with parameters.
-	 * \param cm700 Object of type CM700 used to interact with real motors.
-	 * \param name Name of the Joint object.
-	 * \param id Identificator corresponding to a dynamixel real motor.
-	 * \param max_value Maximum value of the motor position.
-	 * \param min_value Minimum value of the motor position.
-	 * \param unit Unit used in the user workspace.
-	 * \param position Initial position asigned to the motor.
-	 */
-	Joint(CM700 * cm700, char name[], int id, double max_value, double min_value, const char * unit, double position);
+	Joint(double max_value, double min_value, const char * unit);
 
 	/**
 	 * \brief Destructor.
@@ -121,7 +113,7 @@ public:
 	 * \brief Asign a position to the motor.
 	 * \param Position Position asigned to motor.
 	 */
-	void setJointPosition(double position);
+	void setJointNextPosition(double position);
 
 	/**
 	 * \brief Restart motor to initial values.
@@ -206,6 +198,14 @@ public:
 	 * \brief Updates the values of all motors.
 	 */
 	void refreshValues();
+
+	/**
+	* \brief A controlles is added to manipulate the Joint, for example in a simulator like VREP or in a real dynamixel motor, or even in both.
+	**/
+	static int uniqueJointIdGenerator;
+
+	double getNextPositionRad();
+	int getUniqueJointId();
 };
 
 
