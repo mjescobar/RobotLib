@@ -4,7 +4,8 @@
 enum Models 
 {
 	AX12 = 12,
-	MX64 = 54
+	MX64 = 54,
+	AX18 = 18
 };
 
 struct Motor 

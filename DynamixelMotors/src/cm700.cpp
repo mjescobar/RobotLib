@@ -211,7 +211,7 @@ void CM700::setParametersFromModel (int model, Motor & motor)
 		motor.angleRangeDeg = 300;
 	}
 
-	if(model == MX64)
+	else if(model == MX64)
 	{
 		motor.angleResolution = 4095;
 		motor.hasCurrentSensor = false;

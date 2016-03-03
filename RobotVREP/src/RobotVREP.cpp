@@ -73,7 +73,6 @@ RobotVREP::RobotVREP(bool video_recording)
 	simulation_in_progress = false;
 
 	setVideoRecordingMode(video_recording);
-	startSimulation();
 }
 
 RobotVREP::RobotVREP(const char * ip, bool video_recording)
@@ -329,7 +328,6 @@ void RobotVREP::addMotor( Joint * joint, char name[] )
 void RobotVREP::move()
 {
 	pauseCommunication(1);
-
 	if ( getConnectionId() == -1 )
 	{
 		cerr << "The connection with VREP fail" << endl;
@@ -343,6 +341,5 @@ void RobotVREP::move()
 		double position = jointVector.at(i)->getNextPositionRad();
 		setJointTargetPosition( *handler, position, simx_opmode_oneshot);
 	}
-
 	pauseCommunication(0);
 }
