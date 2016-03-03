@@ -16,12 +16,12 @@ CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
 
 CollisionObject::CollisionObject()
 {
-
+	
 }
 
 CollisionObject::~CollisionObject()
 {
-
+	
 }
 
 char * CollisionObject::getName()

@@ -12,6 +12,8 @@ class Joint;
 #include <map>
 #include <vector>
 #include <algorithm>    // std::find
+#include "robotObject.hpp"
+
 
 using namespace std;
 
@@ -49,7 +51,8 @@ class RobotVREP
 	std::vector < int * > VrepHandlerVector;
 	// the mapping from JointUniqueId to Vrep Handler Vector corresponding position.
 	std::map <int , int  > 	jointIdToVrepHandler_map;
-
+	std::vector < RobotObject * > sensorVector;
+	std::map <int , int  >  sensorIdToVrepHandler_map;
 public:
 	/**
 	 * \brief Void constructor. Starts a communication thread with VREP through default ip address.
@@ -202,6 +205,17 @@ public:
 
 	*/
 	void move();
+
+	/**
+
+	*/
+	vector <float> getWorldPosition(RobotObject * robotObject);
+
+	/**
+
+	*/
+	void addSensor( RobotObject * robotObject, char name[] );
+
 };
 
 

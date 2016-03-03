@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-int Joint::uniqueJointIdGenerator = 1;
+
 
 double truncValue(double value, int precision)
 {
@@ -34,12 +34,11 @@ double Joint::RADtoSCALE(double value)
 	return 2.0*(value - min_value)/(max_value - min_value) - 1.0;
 }
 
-Joint::Joint(double max_value, double min_value, const char * unit) 
+Joint::Joint(double max_value, double min_value, const char * unit) : RobotObject()
 {
 	positions = new double[3];
 	this->max_value = max_value;
 	this->min_value = min_value;
-	uniqueJointId = uniqueJointIdGenerator++; // Is the id, but for do not create misunderstand is called diferent than id like DynamixelMotor id.
 
 	if (!strcmp(unit,(char *)"RAD"))
 	{
@@ -113,12 +112,6 @@ double Joint::getMaxAngle()
 double Joint::getMinAngle()
 {
 	return min_value;
-}
-
-
-int Joint::getUniqueJointId()
-{
-	return uniqueJointId;
 }
 
 double Joint::getNextPositionRad()

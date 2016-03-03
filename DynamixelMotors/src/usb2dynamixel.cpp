@@ -42,7 +42,7 @@ void USB2Dynamixel::addMotor(Joint * joint, int id)
 
 	Motor motor;
 	motor.id = id;
-	motor.jointId =  joint->getUniqueJointId();
+	motor.jointId =  joint->getUniqueRobotObjectId();
 
 	//identify model
 	int model = identifyModel(id);
@@ -74,7 +74,7 @@ void USB2Dynamixel::addMotor(Joint * joint, int id, int angleResolution, bool ha
 
 	Motor motor;
 	motor.id = id;
-	motor.jointId =  joint->getUniqueJointId();
+	motor.jointId =  joint->getUniqueRobotObjectId();
 
 	//Settings motors values from model.
 	motor.angleResolution = angleResolution;
@@ -161,7 +161,7 @@ void USB2Dynamixel::move()
 
 	for (unsigned int i = 0; i < jointVector.size(); i++) 
 	{
-		int motorId = jointVector.at(i)->getUniqueJointId();
+		int motorId = jointVector.at(i)->getUniqueRobotObjectId();
 		int motorVectorPosition = idToMotorsVectorPosition_map.at(motorId);
 		double angle_RAD = jointVector.at(i)->getNextPositionRad();
 

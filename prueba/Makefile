@@ -7,4 +7,4 @@ LDFLAGS = -lpthread
 all: prueba
 
 prueba: prueba.cpp
-	@$(CC) $(CFLAGS) ./prueba.cpp ../robotObjects/objects/Joint.o ../RobotVREP/objects/RobotVREP.o ../RobotVREP/objects/extApi.o ../RobotVREP/objects/extApiPlatform.o  -o pruebaApp -lpthread
+	@$(CC) $(CFLAGS) ./prueba.cpp ../robotObjects/objects/Joint.o ../robotObjects/objects/robotObject.o ../RobotVREP/objects/RobotVREP.o ../RobotVREP/objects/extApi.o ../RobotVREP/objects/extApiPlatform.o  -o pruebaApp -lpthread

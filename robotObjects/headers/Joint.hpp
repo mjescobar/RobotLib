@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cmath>
 #include "RobotVREP.hpp"
+#include "robotObject.hpp"
 //#include "cm700.h"
 
 #define RAD_CONV (double)(M_PI/180.0)
@@ -34,7 +35,7 @@
  * \class Joint
  * \brief The joint class is inherited from the Object class and is used to interact with motors in an virtual environment of simulation named VREP or in real robots, more easily and transparently for the user.
  */
-class Joint
+class Joint : public RobotObject
 {
 	// contein the current position of the motor and other two pass positions
 	double * positions;
@@ -89,10 +90,9 @@ class Joint
 	void initParameters (double max_value, double min_value, const char * unit);
 
 
-	int uniqueJointId;
+
 
 public:
-
 	/**
 	 * \brief Constructor with parameters.
 	 * \param simulator Object of type Robotsimulator used to interact with VREP.
@@ -202,10 +202,10 @@ public:
 	/**
 	* \brief A controlles is added to manipulate the Joint, for example in a simulator like VREP or in a real dynamixel motor, or even in both.
 	**/
-	static int uniqueJointIdGenerator;
+	
 
 	double getNextPositionRad();
-	int getUniqueJointId();
+
 };
 
 

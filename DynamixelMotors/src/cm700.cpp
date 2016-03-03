@@ -67,7 +67,7 @@ void CM700::addMotor(Joint * joint, int id, int angleResolution, bool hasCurrent
 
 	Motor motor;
 	motor.id = id;
-	motor.jointId =  joint->getUniqueJointId();
+	motor.jointId =  joint->getUniqueRobotObjectId();
 
 	//Settings motors values from model.
 	motor.angleResolution = angleResolution;
@@ -161,7 +161,7 @@ void CM700::move()
 	for (unsigned int i = 0; i < jointVector.size(); i++) {
 
 
-		int motorId = jointVector.at(i)->getUniqueJointId();
+		int motorId = jointVector.at(i)->getUniqueRobotObjectId();
 		int motorVectorPosition = idToMotorsVectorPosition_map.at(motorId);
 		double angle_RAD = jointVector.at(i)->getNextPositionRad();
 
@@ -189,7 +189,7 @@ void CM700::move()
 
 bool CM700::verifyModel ( int model )
 {
-	if(model == AX12)
+	if( model == AX12 || model == AX18 )
 	{
 		return true;
 	}
@@ -203,7 +203,7 @@ bool CM700::verifyModel ( int model )
 
 void CM700::setParametersFromModel (int model, Motor & motor)
 {	
-	if(model == AX12)
+	if( model == AX12 || model == AX18 )
 	{
 		motor.angleResolution = 1023;
 		motor.hasCurrentSensor = false;
