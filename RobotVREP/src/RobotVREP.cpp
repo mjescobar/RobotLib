@@ -181,24 +181,30 @@ void RobotVREP::getObjectHandle(char name[], int * handle, simxInt operationMode
 	if(error != 0) vrep_error << "simxGetObjectHandle - " << name << " : "<< error << endl;
 }
 
-void RobotVREP::getObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode)
+void RobotVREP::getObjectPosition(RobotObject * robotObject, int relativeTo, double * position, simxInt operationMode)
 {
+	int uniqueId = robotObject->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition = sensorIdToVrepHandler_map.at(uniqueId);
+	int * handler = VrepHandlerVector.at(vrepHandlerVectorPosition);
 	float * aux = new float[3];
 
-	int error = simxGetObjectPosition(clientID, object_handle, relativeTo, aux, operationMode);
-	if(error != 0) vrep_error << "simxGetObjectPosition - " << object_handle << " : "<< error << endl;
+	int error = simxGetObjectPosition(clientID, *handler, relativeTo, aux, operationMode);
+	if(error != 0) vrep_error << "simxGetObjectPosition - " << *handler << " : "<< error << endl;
 
 	for(int i = 0; i < 3; i++)
 		position[i] = (double)aux[i];
 }
 
-void RobotVREP::getObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode)
+void RobotVREP::getObjectVelocity(RobotObject * robotObject, double * lVelocity, double * aVelocity, simxInt operationMode)
 {
+	int uniqueId = robotObject->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition = sensorIdToVrepHandler_map.at(uniqueId);
+	int * handler = VrepHandlerVector.at(vrepHandlerVectorPosition);
 	float * lVel = new float[3];
 	float * aVel = new float[3];
 
-	int error = simxGetObjectVelocity(clientID, object_handle, lVel, aVel, operationMode);
-	if(error != 0) vrep_error << "simxGetObjectVelocity - " << object_handle << " : "<< error << endl;
+	int error = simxGetObjectVelocity(clientID, *handler, lVel, aVel, operationMode);
+	if(error != 0) vrep_error << "simxGetObjectVelocity - " << *handler << " : "<< error << endl;
 
 	if((lVelocity == NULL) && (aVelocity == NULL))
 		clog << "ERROR: lVelocity and aVelocity can not be null at the same time" << endl;
@@ -214,39 +220,54 @@ void RobotVREP::getObjectVelocity(int object_handle, double * lVelocity, double 
 	}	
 }
 
-void RobotVREP::getObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode)
+void RobotVREP::getObjectOrientation(RobotObject * robotObject, int relativeTo, double * orientation, simxInt operationMode)
 {
+	int uniqueId = robotObject->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition = sensorIdToVrepHandler_map.at(uniqueId);
+	int * handler = VrepHandlerVector.at(vrepHandlerVectorPosition);
 	float * aux = new float[3];
 
-	int error = simxGetObjectOrientation(clientID,object_handle, relativeTo, aux, operationMode);
-	if(error != 0) vrep_error << "simxGetObjectOrientation - " << object_handle << " : "<< error << endl;
+	int error = simxGetObjectOrientation(clientID,*handler, relativeTo, aux, operationMode);
+	if(error != 0) vrep_error << "simxGetObjectOrientation - " << *handler << " : "<< error << endl;
 
 	for(int i = 0; i < 3; i++)
 		orientation[i] = (double)aux[i];
 }
 
-double RobotVREP::getJointPosition(int object_handle, simxInt operationMode)
+double RobotVREP::getJointPosition(Joint * joint, simxInt operationMode)
 {
+	int uniqueID = joint->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition =jointIdToVrepHandler_map.at ( uniqueID );
+	int * handler = VrepHandlerVector.at( vrepHandlerVectorPosition );
+
 	float joint_pos;
 
-	int error = simxGetJointPosition(clientID, object_handle, &joint_pos, operationMode);
-	if(error != 0) vrep_error << "simxGetJointPosition - " << object_handle << " : "<< error << endl;
+	int error = simxGetJointPosition(clientID, *handler, &joint_pos, operationMode);
+	if(error != 0) vrep_error << "simxGetJointPosition - " << *handler << " : "<< error << endl;
 
 	return (double)joint_pos;
 }
 
-void RobotVREP::setJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode)
+void RobotVREP::setJointTargetPosition(Joint * joint, double joint_pos, simxInt operationMode)
 {
-	int error = simxSetJointTargetPosition(clientID, object_handle, (float)joint_pos, operationMode);
-	if(error != 0) vrep_error << "simxSetJointTargetPosition - " << object_handle << " : "<< error << endl;	
+	int uniqueID = joint->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition =jointIdToVrepHandler_map.at ( uniqueID );
+	int * handler = VrepHandlerVector.at( vrepHandlerVectorPosition );
+
+	int error = simxSetJointTargetPosition(clientID, *handler, (float)joint_pos, operationMode);
+	if(error != 0) vrep_error << "simxSetJointTargetPosition - " << *handler << " : "<< error << endl;	
 }
 
-double RobotVREP::getJointForce(int object_handle, simxInt operationMode)
+double RobotVREP::getJointForce(Joint * joint, simxInt operationMode)
 {
+	int uniqueID = joint->getUniqueRobotObjectId();
+	int vrepHandlerVectorPosition =jointIdToVrepHandler_map.at ( uniqueID );
+	int * handler = VrepHandlerVector.at( vrepHandlerVectorPosition );
+
 	float force;
 
-	int error = simxGetJointForce(clientID, object_handle, &force, operationMode);
-	if(error != 0) vrep_error << "simxGetJointForce - " << object_handle << " : "<< error << endl;
+	int error = simxGetJointForce(clientID, *handler, &force, operationMode);
+	if(error != 0) vrep_error << "simxGetJointForce - " << *handler << " : "<< error << endl;
 
 	return (double)force;
 }
@@ -257,20 +278,20 @@ void RobotVREP::addStatusbarMessage(char * message, simxInt operationMode)
 	if(error != 0) vrep_error << "simxAddStatusbarMessage - " << message << " : " << error << endl;
 } 
 
-void RobotVREP::readCollision(int collisionHandle, int * collisionState, simxInt operationMode)
-{
-	unsigned char * aux = (unsigned char*)malloc(sizeof(unsigned char)*100);
-	int error = simxReadCollision(clientID, collisionHandle, aux, operationMode);
-	if(error != 0) vrep_error << "simxReadCollision - " << collisionHandle << " : " << error << endl;	
-	*collisionState = (int)*aux;
-	free(aux);
-}
+// void RobotVREP::readCollision(int collisionHandle, int * collisionState, simxInt operationMode)
+// {
+// 	unsigned char * aux = (unsigned char*)malloc(sizeof(unsigned char)*100);
+// 	int error = simxReadCollision(clientID, collisionHandle, aux, operationMode);
+// 	if(error != 0) vrep_error << "simxReadCollision - " << collisionHandle << " : " << error << endl;	
+// 	*collisionState = (int)*aux;
+// 	free(aux);
+// }
 
-void RobotVREP::getCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
-{
-	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
-	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;
-}
+// void RobotVREP::getCollisionHandle(char name[], int * collisionHandle, simxInt operationMode)
+// {
+// 	int error = simxGetCollisionHandle(clientID, name, collisionHandle, operationMode);
+// 	if(error != 0) vrep_error << "simxGetCollisionHandle: " << name << " : " << error << endl;
+// }
 
 
 void RobotVREP::changeVideoPath(char path[], simxInt operationMode)
@@ -341,10 +362,8 @@ void RobotVREP::move()
 
 	for (unsigned int i = 0; i < jointVector.size(); ++i)
 	{
-		int jointId = jointVector.at(i)->getUniqueRobotObjectId();
-		int * handler =  VrepHandlerVector.at( jointIdToVrepHandler_map.at( jointId ) );
 		double position = jointVector.at(i)->getNextPositionRad();
-		setJointTargetPosition( *handler, position, simx_opmode_oneshot);
+		setJointTargetPosition( jointVector.at(i), position, simx_opmode_oneshot);
 	}
 	pauseCommunication(0);
 }

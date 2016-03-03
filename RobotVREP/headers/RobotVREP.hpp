@@ -122,7 +122,7 @@ public:
 	 * \param position Pointer to 3 values receiving the position.
 	 * \param operationMode A remote API function operation mode. Default operation mode for this function is simx_opmode_oneshot_wait if the argument is not passed.
 	 */
-	void getObjectPosition(int object_handle, int relativeTo, double * position, simxInt operationMode = /*simx_opmode_oneshot_wait*/ 0x010000);
+	void getObjectPosition(RobotObject * robotObject, int relativeTo, double * position, simxInt operationMode = /*simx_opmode_oneshot_wait*/ 0x010000);
 
 	/**
 	 * \brief Retrieves the position of an object.
@@ -130,7 +130,7 @@ public:
 	 * \param velocity Retrieves the linear velocity of an object.
 	 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 	 */
-	void getObjectVelocity(int object_handle, double * lVelocity, double * aVelocity, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
+	void getObjectVelocity(RobotObject * robotObject, double * lVelocity, double * aVelocity, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
 
 	/**
 	 * \brief Retrieves the orientation (Euler angles) of an object.
@@ -139,7 +139,7 @@ public:
 	 * \param orientation Pointer to 3 values receiving the Euler angles (alpha, beta and gamma).
 	 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 	 */
-	void getObjectOrientation(int object_handle, int relativeTo, double * orientation, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
+	void getObjectOrientation(RobotObject * robotObject, int relativeTo, double * orientation, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
 
 	/**
 	 * \brief Retrieves the intrinsic position of a joint.
@@ -147,7 +147,7 @@ public:
 	 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 	 * \return The intrinsic position of the joint. This is a one-dimensional value: if the joint is revolute, the rotation angle is returned, if the joint is prismatic, the translation amount is returned, etc.
 	 */
-	double getJointPosition(int object_handle, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
+	double getJointPosition(Joint * joint, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
 
 	/**
 	 * \brief Sets the target position of a joint if the joint is in torque/force mode (also make sure that the joint's motor and position control are enabled).
@@ -155,7 +155,7 @@ public:
 	 * \param joint_pos Target position of the joint (angular or linear value depending on the joint type).
 	 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_oneshot (default) or simx_opmode_streaming.
 	 */
-	void setJointTargetPosition(int object_handle, double joint_pos, simxInt operationMode = /*simx_opmode_oneshot*/ 0x000000);
+	void setJointTargetPosition(Joint * joint, double joint_pos, simxInt operationMode = /*simx_opmode_oneshot*/ 0x000000);
 
 	/**
 	 * \brief Retrieves the force or torque applied to a joint along/about its active axis. This function retrieves meaningful information only if the joint is prismatic or revolute, and is dynamically enabled. With the Bullet engine, this function returns the force or torque applied to the joint motor (torques from joint limits are not taken into account). With the ODE or Vortex engine, this function returns the total force or torque applied to a joint along/about its z-axis.
@@ -163,7 +163,7 @@ public:
 	 * \param operationMode A remote API function operation mode. Recommended operation modes for this function are simx_opmode_streaming (the first call) and simx_opmode_buffer (the following calls, assigned as default).
 	 * \return The force or the torque applied to the joint along/about its z-axis.
 	 */
-	double getJointForce(int object_handle, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
+	double getJointForce(Joint * joint, simxInt operationMode = /*simx_opmode_buffer*/ 0x060000);
 
 	/**
 	 * \brief Adds a message to the status bar.
