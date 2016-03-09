@@ -49,11 +49,11 @@ void RobotVREP::setVideoRecordingMode(bool active)
 	}
 
 	error = simxSetBooleanParameter(clientID, sim_boolparam_video_recording_triggered, active, simx_opmode_oneshot);
-	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_video_recording_triggered" << error << endl;
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_video_recording_triggered - " << error << endl;
 	error = simxSetBooleanParameter(clientID, sim_boolparam_browser_visible,!active, simx_opmode_oneshot);
-	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_browser_visible" << error << endl;
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_browser_visible - " << error << endl;
 	error = simxSetBooleanParameter(clientID, sim_boolparam_hierarchy_visible,!active, simx_opmode_oneshot);
-	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_hierarchy_visible" << error << endl;
+	if(error != 0) vrep_error << " simxSetBooleanParameter : sim_boolparam_hierarchy_visible - " << error << endl;
 
 }
 
@@ -67,7 +67,7 @@ RobotVREP::RobotVREP(bool video_recording, int port, const char * ip)
 		return;
 	}
 
-	vrep_error.open("error_files/vrep_error.txt");
+	vrep_error.open("vrep_error.txt");
 
 	simulation_in_progress = false;
 
@@ -344,7 +344,7 @@ void RobotVREP::addObject( Object * object)
 
 void RobotVREP::addCollisionObject( CollisionObject * collisionObject)
 {
-	int * handler = new int(getObjectHandle(collisionObject->getName(), simx_opmode_oneshot_wait));
+	int * handler = new int(getCollisionHandle(collisionObject->getName(), simx_opmode_oneshot_wait));
 	VrepHandlerVector.push_back( handler );
 	collisionObjectVector.push_back( collisionObject );
 	collisionObjectIdToVrepHandler_map.insert( std::pair<int,int> ( collisionObject->getUniqueObjectId() , VrepHandlerVector.size() -1 ) );
