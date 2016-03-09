@@ -139,6 +139,11 @@ double Joint::getJointInitialPositionRad()
 	return initial_position;
 }
 
+double Joint::getJointInitialPosition()
+{
+	return (this->*convertFromRadTo)(initial_position);
+}
+
 double Joint::getMaxAngle()
 {
 	return max_value;

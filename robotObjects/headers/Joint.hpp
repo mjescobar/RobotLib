@@ -105,10 +105,16 @@ public:
 	double getJointGoalPosition();
 
 	/**
-	 * \brief Retrieve the initial position of the joint.
+	 * \brief Retrieve the initial position of the joint in radian.
 	 * \return Initial joit position.
 	 */
 	double getJointInitialPositionRad();
+
+	/**
+	 * \brief Retrieve the initial position of the joint.
+	 * \return Initial joit position.
+	 */
+	double getJointInitialPosition();
 
 	/**
 	 * \brief Retrieve the maximum angle value of the joint.
