@@ -1,9 +1,6 @@
 #include "Joint.hpp"
 #include <iostream>
 
-
-
-
 double truncValue(double value, int precision)
 {
 	return (double)floor(value*pow(10,precision))/pow(10,precision);
@@ -34,11 +31,17 @@ double Joint::RADtoSCALE(double value)
 	return 2.0*(value - min_value)/(max_value - min_value) - 1.0;
 }
 
-Joint::Joint(double max_value, double min_value, const char * unit) : RobotObject()
+Joint::Joint(const char name[], double max_value, double min_value, double initial_position, const char * unit) : Object(name)
 {
 	positions = new double[3];
+
 	this->max_value = max_value;
 	this->min_value = min_value;
+	this->initial_position = initial_position;
+
+	pass_slope_sign = 1;
+	next_slope_sign = 1;
+	joint_change_direction = false;
 
 	if (!strcmp(unit,(char *)"RAD"))
 	{
@@ -65,6 +68,13 @@ Joint::Joint(double max_value, double min_value, const char * unit) : RobotObjec
 Joint::~Joint()
 {
 
+}
+
+void Joint::setInitialValues()
+{
+	pass_slope_sign = 1;
+	next_slope_sign = 1;
+	joint_change_direction = false;
 }
 
 void Joint::setJointNextPosition(double position)
@@ -99,9 +109,34 @@ void Joint::setJointNextPosition(double position)
 	}
 }
 
+bool Joint::getJointChangeDirection()
+{
+	double aux_slope = 0;
+
+	pass_slope_sign = next_slope_sign;
+	aux_slope = positions[0] - positions[1];
+
+	if(abs(aux_slope) > TOLERANCE)
+	{
+		if(aux_slope < 0) next_slope_sign = -1;
+		else next_slope_sign = 1; 
+	}		
+
+	if(next_slope_sign != pass_slope_sign) joint_change_direction = true;
+	else joint_change_direction = false;
+	
+
+	return joint_change_direction;
+}
+
 double Joint::getJointGoalPosition()
 {
 	return (this->*convertFromRadTo)(positions[0]);
+}
+
+double Joint::getJointInitialPositionRad()
+{
+	return initial_position;
 }
 
 double Joint::getMaxAngle()

@@ -1,5 +1,4 @@
 #include "Joint.hpp"
-#include "robotObject.hpp"
 #include "RobotVREP.hpp"
 #include <vector>
 #include <sstream>
@@ -18,19 +17,18 @@ int main()
 	// Agregando los motores.
 	for(int i = 0; i < numMotores; i++)
 	{
-		Joint * joint  = new Joint(M_PI/4.0, -M_PI/4.0, (char *)"SCALE" );
-		jointVector.push_back( joint );
 		stringstream jointName;
 		jointName << "joint" << i << "#";
-		simulador->addMotor( joint, (char *)jointName.str().c_str());
+		Joint * joint  = new Joint((char *)jointName.str().c_str(), M_PI/4.0, -M_PI/4.0, 0.0,(char *)"SCALE" );
+		jointVector.push_back( joint );		
+		simulador->addJoint( joint );
 	}
-
 
 	// Agregando los sensores
 
-	RobotObject * argoCenter = new RobotObject();
+	Object * argoCenter = new Object((char *)"ArgoV2_reference");
 
-	simulador->addSensor(argoCenter, (char *) "ArgoV2" );
+	simulador->addObject(argoCenter);
 
 
 	simulador->startSimulation();
@@ -41,10 +39,19 @@ int main()
 			double delta = (2*(rand()/(double)(RAND_MAX)) -1 )*0.1; 
 			jointVector.at(i)->setJointNextPosition( jointVector.at(i)->getJointGoalPosition() + delta );
 		}
-		simulador->move();
-		std::vector <float> position;
-		position = simulador->getWorldPosition(argoCenter);
+		simulador->moveJoints();
+		std::vector <double> position;
+		position = simulador->getObjectPosition(argoCenter);
 		cout << "Argo position: " << position.at(0) << ", " << position.at(1) << ", " << position.at(2) << endl;
 	}
+
+	delete simulador;
+	delete argoCenter;
+
+	for(int i = 0; i < numMotores; i++)
+	{
+		delete jointVector.at(i);
+	}
+
 
 }

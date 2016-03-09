@@ -5,7 +5,7 @@ EXTFLAGS = -I../RobotVREP/headers -I../DynamixelMotors/headers
 
 LDFLAGS = -lpthread
 
-all: Joint.o CollisionObject.o RobotObject.o
+all: Joint.o CollisionObject.o Object.o
 
 
 Joint.o: Joint.cpp 
@@ -18,10 +18,10 @@ CollisionObject.o: CollisionObject.cpp
 	@echo "Compiling CollisionObject.cpp to CollisionObject.o"
 	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/CollisionObject.cpp -o ./objects/CollisionObject.o
 
-RobotObject.o: robotObject.cpp
+Object.o: Object.cpp
 	@mkdir -p objects 
-	@echo "Compiling robotObject.cpp to robotObject.o"
-	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/robotObject.cpp -o ./objects/robotObject.o
+	@echo "Compiling Object.cpp to Object.o"
+	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/Object.cpp -o ./objects/Object.o
 
 clean:
 	@rm -f -R ./objects

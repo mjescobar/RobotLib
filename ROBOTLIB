@@ -1,4 +1,6 @@
 #include "ROBOTLIB_headers/Object.hpp"
 #include "ROBOTLIB_headers/Joint.hpp"
 #include "ROBOTLIB_headers/CollisionObject.hpp"
+#include "ROBOTLIB_headers/RobotVREP.hpp"
+#include "ROBOTLIB_headers/dynamixelMotor.hpp"
 #include "ROBOTLIB_headers/v_repConst.h"

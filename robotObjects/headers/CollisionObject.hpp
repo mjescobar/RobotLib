@@ -4,60 +4,40 @@
 #include <stdlib.h>
 #include <iostream>
 #include <cstring>
-
-#include "RobotVREP.hpp"
-
-
-
+#include "Object.hpp"
 
 /**
  * \class CollisionObject
  * \brief The CollisionObject class is used to interact with collisionable objects in an virtual environment of simulation named VREP or in real robots, more easily and transparently for the user.
  */
-class CollisionObject
+class CollisionObject : public Object
 {
-	// Object of class RobotVREP used to interact with VREP simulator.
-	RobotVREP * simulator;
-	// Name of a object, needed for use an virtual or real environment workspace.
-	char * name;
-	// Collision state of the object. if exist collision its value will be 1, otherwise it will be 0.
-	int collisionState;
-	// Identificator corresponding to an object in VREP simulator.
-	int collisionHandle;
+	// Collision state of the object. if exist collision its value will be true, otherwise it will be false.
+	bool collisionState;
 
 public:
 	/**
 	 * \brief Constructor with parameters.
-	 * \param simulator Object of class simulator used for interact with VREP.
 	 * \param name Name of the motor.
 	 */
-	CollisionObject(RobotVREP * simulator, char name[]);
-	/**
-	 * \brief Void constructor
-	 */
-	CollisionObject();
+	CollisionObject(char name[]);
+
 	/**
 	 * \brief Destructor
 	 */
-	~CollisionObject();	
+	~CollisionObject();
 
 	/**
-	 * \brief Retrieves the name corresponding to object.
-	 * \return The object name.
+	 * \brief Sets the collision state of a registered collision object.
+	 * \param collisionState The collision state
 	 */
-	char * getName();
+	void setCollisionState(bool collisionState);
 
 	/**
-	 * \brief Reads the collision state of a registered collision object.
+	 * \brief Reads the last collision state of a registered collision object.
 	 * \return The collision state (0: not colliding).
 	 */
-	int getCollisionState();
-
-	/**
-	 * \brief Retrieves the handle corresponding to collisionObject in VREP simulator.
-	 * \return The object handle value.
-	 */
-	int getCollisionHandle();
+	bool getLastCollisionState();
 };
 
 

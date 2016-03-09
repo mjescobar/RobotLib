@@ -1,19 +1,22 @@
 LDFLAGS = -lpthread
 
-
 OBJS = ./remoteApi/extApi.o ./remoteApi/extApiPlatform.o
 
 EXT_OBJS = ./robotObjects/objects/Joint.o ./robotObjects/objects/Dummy.o ./robotObjects/objects/CollisionObject.o ./robotObjects/objects/Object.o ./RobotVREP/objects/RobotVREP.o ./DynamixelMotors/objects/cm700.o ./DynamixelMotors/objects/serial.o ./DynamixelMotors/objects/dynamixel.o ./DynamixelMotors/objects/dxl_hal.o
 
 
 
-OODIR=objects/objects
-_OOBJS = Joint.o CollisionObject.o Object.o 
-OOBJS = $(patsubst %,$(OODIR)/%,$(_OOBJS))
+ROBOTOBJECTS_ODIR=robotObjects/objects
+_ROBOTOBJECTS_OBJS = Joint.o CollisionObject.o Object.o 
+ROBOTOBJECTS_OBJS = $(patsubst %,$(ROBOTOBJECTS_ODIR)/%,$(_ROBOTOBJECTS_OBJS))
 
-RCODIR=DynamixelMotors/objects
-_RCOBJS = cm700.o serial.o dynamixel.o dxl_hal.o
-RCOBJS = $(patsubst %,$(RCODIR)/%,$(_RCOBJS))
+ROBOTVREP_ODIR=RobotVREP/objects
+_ROBOTVREP_OBJS = RobotVREP.o extApi.o extApiPlatform.o
+ROBOTVREP_OBJS = $(patsubst %,$(ROBOTVREP_ODIR)/%,$(_ROBOTVREP_OBJS))
+
+DYNAMIXELMOTORS_ODIR=DynamixelMotors/objects
+_DYNAMIXELMOTORS_OBJS = cm700.o serial.o dynamixel.o dxl_hal.o
+DYNAMIXELMOTORS_OBJS = $(patsubst %,$(DYNAMIXELMOTORS_ODIR)/%,$(_DYNAMIXELMOTORS_OBJS))
 
 all: 
 	@echo "Compiling RobotVREP"
@@ -24,24 +27,15 @@ all:
 	@cd ./robotObjects; make
 
 clean:
-		@rm -f $(OBJS)
 		@cd ./RobotVREP; make clean		
 		@cd ./DynamixelMotors; make clean
 		@cd ./robotObjects; make clean
-
-
-cleanall:
-		@rm -f $(OBJS)
-		@cd ./RobotVREP; make clean		
-		@cd ./DynamixelMotors; make clean
-		@cd ./objects; make clean
-
 
 cleandocs:
 	@rm -f -R ./doc
 
 install:
-	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(OOBJS) $(RCOBJS) $(RVOBJS) $(LDFLAGS)
+	@g++ -shared -Wl,-soname,librobotlib.so.1 -o librobotlib.so.1.0 $(ROBOTOBJECTS_OBJS) $(DYNAMIXELMOTORS_OBJS) $(ROBOTVREP_OBJS) $(LDFLAGS)
 	@ln -sf librobotlib.so.1.0 librobotlib.so
 	@ln -sf librobotlib.so.1.0 librobotlib.so.1
 	@mv librobotlib.so.1.0 librobotlib.so librobotlib.so.1 /usr/lib

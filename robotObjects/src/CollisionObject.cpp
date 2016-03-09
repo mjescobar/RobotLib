@@ -1,22 +1,8 @@
 #include "CollisionObject.hpp"
 
-CollisionObject::CollisionObject(RobotVREP * simulator, char name[])
+CollisionObject::CollisionObject(char name[]) : Object(name)
 {
-	this->simulator = NULL;
-	this->simulator = simulator;
-
-	int size = strlen(name)+1;
-	this->name = new char[size];
-	strncpy(this->name, name, size);
-	
-	simulator->getCollisionHandle(this->name, &collisionHandle, simx_opmode_oneshot_wait);
-
-	simulator->readCollision(collisionHandle, &collisionState, simx_opmode_streaming);
-}
-
-CollisionObject::CollisionObject()
-{
-	
+	collisionState = false;
 }
 
 CollisionObject::~CollisionObject()
@@ -24,18 +10,12 @@ CollisionObject::~CollisionObject()
 	
 }
 
-char * CollisionObject::getName()
+void CollisionObject::setCollisionState(bool collisionState)
 {
-	return name;
+	this->collisionState = collisionState;
 }
 
-int CollisionObject::getCollisionHandle()
+bool CollisionObject::getLastCollisionState()
 {
-	return collisionHandle;
-}
-
-int CollisionObject::getCollisionState()
-{
-	simulator->readCollision(collisionHandle, &collisionState, simx_opmode_streaming);
 	return collisionState;
 }
