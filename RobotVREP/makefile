@@ -32,7 +32,6 @@ DEPS3 = $(patsubst %,$(IDIR3)/%,$(_DEPS3))
 SDIR1=src
 SDIR2=remoteApi
 
-
 all: RobotVREP.o extApi.o extApiPlatform.o
 
 # $(ODIR)/%.o: $(SDIR1)/%.cpp $(DEPS1) $(DEPS2) $(DEPS3)
@@ -43,7 +42,6 @@ all: RobotVREP.o extApi.o extApiPlatform.o
 RobotVREP.o: RobotVREP.hpp RobotVREP.cpp 
 	@mkdir -p objects
 	$(CXX) $(CFLAGS_EXT) $(CFLAGS) -c ./src/RobotVREP.cpp -o ./objects/RobotVREP.o
-
 
 # $(ODIR)/%.o: $(SDIR2)/%.c $(DEPS2) $(DEPS3)
 # 	@mkdir -p objects 

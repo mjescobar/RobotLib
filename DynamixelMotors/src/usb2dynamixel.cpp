@@ -9,12 +9,10 @@
 USB2Dynamixel::USB2Dynamixel(string serialPort, int baudNum = 1) 
 {
 	//Se comienza la comunicacion serial con los motores.
-	if (dxl_initialize(/* serialPort.c_str() */ 0, baudNum) == 0) // Modificar para que acepte un string dado que es mas convencional
+	if (dxl_initialize( std::stoi( serialPort ), baudNum) == 0) // Modificar para que acepte un string dado que es mas convencional
 	{
-		cout << "Failed to open USB2Dynamixel!" << endl;
-		cout << "Press Enter key to terminate..." << endl;
-		cin.get();
-		return;
+		cerr << "Failed to open USB2Dynamixel!" << endl;
+		exit(EXIT_FAILURE);
 	} 
 	else 
 	{
@@ -162,7 +160,7 @@ void USB2Dynamixel::move()
 	for (unsigned int i = 0; i < jointVector.size(); i++) 
 	{
 		int motorId = jointVector.at(i)->getUniqueObjectId();
-		int motorVectorPosition = idToMotorsVectorPosition_map.at(motorId);
+		int motorVectorPosition = idToMotorsVectorPosition_map.at( jointIdToId_map.at( motorId ) );
 		double angle_RAD = jointVector.at(i)->getNextPositionRad();
 
 		dxl_set_txpacket_parameter(2 + 5 * i, motors.at(motorVectorPosition).id);
@@ -181,17 +179,16 @@ void USB2Dynamixel::move()
 		dxl_set_txpacket_parameter(2 + 5 * i + 4, _H16(512) );
 	}
 
-	dxl_tx_packet();
+	dxl_txrx_packet();
 	int amountOfAttempts = 4;
 	int attempsCount = 0;
 	while ( dxl_get_result() != COMM_TXSUCCESS )
 	{
-		
-		std::clog << "Warning::data losses tring to move dynamixel motors" << std::endl;
+		//std::clog << "Warning::data losses tring to move dynamixel motors" << std::endl;
 		//try again
 		dxl_tx_packet();
-		amountOfAttempts++;
-		if(attempsCount == amountOfAttempts)
+		attempsCount++;
+		if(attempsCount >= amountOfAttempts)
 		{
 			std::clog << "Warning::Amount of attemps to move dynamixel motors exceeded." << std::endl;
 			break;

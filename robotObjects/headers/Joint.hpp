@@ -75,7 +75,7 @@ public:
 	 * \param unit Unit used in the user workspace.
 	 * \param position Initial position asigned to the motor.
 	 */
-	Joint(const char name[] = "unknown", double max_value = M_PI, double min_value = -M_PI, double initial_position = 0.0, const char * unit = "RAD");
+	Joint(const char * unit = "RAD", const char name[] = "unknown", double max_value = M_PI, double min_value = -M_PI, double initial_position = 0.0);
 
 	/**
 	 * \brief Destructor.

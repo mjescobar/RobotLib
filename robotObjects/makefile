@@ -5,8 +5,12 @@ EXTFLAGS = -I../RobotVREP/headers -I../DynamixelMotors/headers
 
 LDFLAGS = -lpthread
 
-all: Joint.o CollisionObject.o Object.o
+all: VisionSensor.o Joint.o CollisionObject.o Object.o
 
+VisionSensor.o: VisionSensor.cpp 
+	@mkdir -p objects 
+	@echo "Compiling VisionSensor.cpp to VisionSensor.o"
+	@$(CC) $(CFLAGS) $(EXTFLAGS) -c ./src/VisionSensor.cpp -o ./objects/VisionSensor.o
 
 Joint.o: Joint.cpp 
 	@mkdir -p objects 

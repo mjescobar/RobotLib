@@ -24,7 +24,7 @@
 // along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
+// This file was automatically created for V-REP release V3.3.1 Rev1 on May 17th 2016
 
 #ifndef _EXTAPIPLATFORM__
 #define _EXTAPIPLATFORM__
@@ -72,6 +72,8 @@ simxFloat extApi_endianConversionFloat(simxFloat floatValue);
 simxDouble extApi_endianConversionDouble(simxDouble floatValue);
 
 /* Following functions might be platform specific */
+simxFloat extApi_getFloatFromPtr(const simxUChar* ptr);
+simxInt extApi_getIntFromPtr(const simxUChar* ptr);
 simxUChar* extApi_allocateBuffer(simxInt bufferSize);
 simxVoid extApi_releaseBuffer(simxUChar* buffer);
 simxVoid extApi_createMutexes(simxInt clientID);

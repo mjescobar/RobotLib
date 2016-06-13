@@ -27,13 +27,13 @@
 // along with V-REP.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
+// This file was automatically created for V-REP release V3.3.1 Rev1 on May 17th 2016
 
 #if !defined(V_REPCONST_INCLUDED_)
 #define V_REPCONST_INCLUDED_
 
-#define VREP_PROGRAM_VERSION_NB 30300
-#define VREP_PROGRAM_VERSION "3.3.0."
+#define VREP_PROGRAM_VERSION_NB 30301
+#define VREP_PROGRAM_VERSION "3.3.1."
 
 #define VREP_PROGRAM_REVISION_NB 1
 #define VREP_PROGRAM_REVISION "(rev. 1)"
@@ -50,11 +50,13 @@ enum {
 		sim_object_reserved2,
 		sim_object_path_type,
 		sim_object_visionsensor_type,
-		sim_object_volume_type,
+		sim_object_reserved3,
 		sim_object_mill_type,
 		sim_object_forcesensor_type,
 		sim_object_light_type,
 		sim_object_mirror_type,
+		sim_object_octree_type,
+		sim_object_pointcloud_type,
 		sim_object_type_end=sim_object_path_type+100
 };
 
@@ -245,8 +247,8 @@ enum { /* Check the documentation instead of comments below!! */
 		sim_message_eventcallback_rmlposition, /* the command simRMLPosition was called. The appropriate plugin should handle the call */
 		sim_message_eventcallback_rmlvelocity, /* the command simRMLVelocity was called. The appropriate plugin should handle the call */
 
-		sim_message_eventcallback_meshcalculationplugin, /* to interact with the mesh calculation plugin */
-		sim_message_eventcallback_dynamicsplugin, /* deprecated */
+		sim_message_eventcallback_reserved18,
+		sim_message_eventcallback_reserved19,
 		sim_message_eventcallback_pathplanningplugin, /* to interact with the path planning plugin */
 		sim_message_eventcallback_colladaplugin, /* to interact with the collada plugin */
 
@@ -271,21 +273,22 @@ enum { /* Check the documentation instead of comments below!! */
 		sim_message_eventcallback_extrenderer_mesh,
 		sim_message_eventcallback_extrenderer_stop,
 
-		sim_message_eventcallback_dynamicspluginbullet, /* to interact with the dynamics calculation plugin, Bullet */
-		sim_message_eventcallback_dynamicspluginode, /* to interact with the dynamics calculation plugin, ODE */
-		sim_message_eventcallback_dynamicspluginvortex, /* to interact with the dynamics calculation plugin, Vortex */
-		sim_message_eventcallback_dynamicspluginnewton, /* to interact with the dynamics calculation plugin, Newton */
-		sim_message_eventcallback_dynamicspluginreserved2, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved3, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved4, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved5, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved6, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved7, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved8, /* for future extensions */
-		sim_message_eventcallback_dynamicspluginreserved9, /* for future extensions */
+		sim_message_eventcallback_reserved6,
+		sim_message_eventcallback_reserved7,
+		sim_message_eventcallback_reserved8,
+		sim_message_eventcallback_reserved9,
+		sim_message_eventcallback_reserved10,
+		sim_message_eventcallback_reserved11,
+		sim_message_eventcallback_reserved12,
+		sim_message_eventcallback_reserved13,
+		sim_message_eventcallback_reserved14,
+		sim_message_eventcallback_reserved15,
+		sim_message_eventcallback_reserved16,
+		sim_message_eventcallback_reserved17,
 
 		sim_message_eventcallback_extrenderer_triangles,
-
+		sim_message_eventcallback_simulationabouttoend,
+		sim_message_eventcallback_instanceabouttoswitch,
 
 		sim_message_simulation_start_resume_request=0x1000,
 		sim_message_simulation_pause_request,
@@ -343,7 +346,7 @@ enum { /* Scene object properties. Combine with the | operator */
 	sim_objectproperty_depthinvisible			=0x1000
 };
 
-enum { /* type of arguments (input and output) for custom lua commands */
+enum { /* DEPRECATED, check below */
 	sim_lua_arg_nil=0,			
 	sim_lua_arg_bool,		
 	sim_lua_arg_int,
@@ -356,7 +359,27 @@ enum { /* type of arguments (input and output) for custom lua commands */
 	/* SIM_LUA_ARG_NIL_ALLOWED=65536 is defined and used in CLuaFunctionData.h. This flag is reserved here. */
 };
 
-enum { /* custom user interface properties. Values are serialized. */
+enum { /* type of arguments (input and output) for custom script commands */
+	sim_script_arg_null=0,
+	sim_script_arg_bool,
+	sim_script_arg_int32,
+	sim_script_arg_float,
+	sim_script_arg_string,
+	sim_script_arg_invalid,
+	sim_script_arg_charbuff,
+	sim_script_arg_double,
+	sim_script_arg_table=8
+	/* SIM_SCRIPT_ARG_NULL_ALLOWED=65536 is defined and used in CScriptFunctionData.h. This flag is reserved here. */
+};
+
+enum { /* OpenGl-based custom UI menu attributes: */
+	sim_ui_menu_title		=1,
+	sim_ui_menu_minimize	=2,
+	sim_ui_menu_close		=4,
+	sim_ui_menu_systemblock =8
+};
+
+enum { /* OpenGl-based custom UI properties. Values are serialized. */
 	sim_ui_property_visible						=0x0001,
 	sim_ui_property_visibleduringsimulationonly	=0x0002,
 	sim_ui_property_moveable					=0x0004,
@@ -630,13 +653,6 @@ enum { /* particle objects: */
 	sim_particle_painttag				=0x10000 /* The particles can be seen by vision sensors (sim_particle_invisible must not be set) */
 };
 
-enum { /* custom user interface menu attributes: */
-	sim_ui_menu_title		=1,
-	sim_ui_menu_minimize	=2,
-	sim_ui_menu_close		=4,
-	sim_ui_menu_systemblock =8
-};
-
 enum { /* Boolean parameters: */
 	sim_boolparam_hierarchy_visible=0,
 	sim_boolparam_console_visible,
@@ -685,7 +701,8 @@ enum { /* Boolean parameters: */
 	sim_boolparam_stop_toolbarbutton_enabled,
 	sim_boolparam_waiting_for_trigger,
 	sim_boolparam_objproperties_toolbarbutton_enabled,
-	sim_boolparam_calcmodules_toolbarbutton_enabled
+	sim_boolparam_calcmodules_toolbarbutton_enabled,
+	sim_boolparam_rosinterface_donotrunmainscript
 };
 
 enum { /* Integer parameters: */
@@ -710,11 +727,11 @@ enum { /* Integer parameters: */
 	sim_intparam_event_flags_read_clear, /* can only be read */
 	sim_intparam_platform, /* can only be read */
 	sim_intparam_scene_unique_id, /* can only be read */
-	sim_intparam_work_thread_count, /* 0-256. 0 to disable, -1 to try to automatically set */
+	sim_intparam_work_thread_count, /* deprecated */
 	sim_intparam_mouse_x, /* can only be read */
 	sim_intparam_mouse_y, /* can only be read */
 	sim_intparam_core_count, /* can only be read */
-	sim_intparam_work_thread_calc_time_ms,
+	sim_intparam_work_thread_calc_time_ms, /* deprecated */
 	sim_intparam_idle_fps,
 	sim_intparam_prox_sensor_select_down,
 	sim_intparam_prox_sensor_select_up,
@@ -771,7 +788,7 @@ enum { /* Array parameters: */
 	sim_arrayparam_random_euler
 };
 
-enum { /* User interface elements: */
+enum { /* UI properties: */
 	sim_gui_menubar						=0x00001,
 	sim_gui_popups						=0x00002,
 	sim_gui_toolbar1					=0x00004,
@@ -1168,17 +1185,363 @@ enum { /* Object int/float/string parameters */
 	sim_mplanintparam_clear_nodes= 25002
 };
 
+enum { /* stack table info */
+	sim_stack_table_not_table=-3,
+	sim_stack_table_map=-2,
+	sim_stack_table_empty=0
+};
+
+enum { /* Physics engines params */
+	/* Bullet */
+	sim_bullet_global_float_start=0,
+	sim_bullet_global_stepsize,
+	sim_bullet_global_internalscalingfactor,
+	sim_bullet_global_collisionmarginfactor,
+	sim_bullet_global_float_end,
+
+	sim_bullet_global_int_start=1000,
+	sim_bullet_global_constraintsolvingiterations,
+	sim_bullet_global_bitcoded,
+	sim_bullet_global_constraintsolvertype,
+	sim_bullet_global_int_end,
+
+	sim_bullet_global_bool_start=2000,
+	sim_bullet_global_fullinternalscaling,
+	sim_bullet_global_bool_end,
+
+	sim_bullet_joint_float_start=3000,
+	sim_bullet_joint_stoperp,
+	sim_bullet_joint_stopcfm,
+	sim_bullet_joint_normalcfm,
+	sim_bullet_joint_float_end,
+
+	sim_bullet_joint_int_start=4000,
+	/* if you add something here, search for bji11032016 */
+	sim_bullet_joint_int_end,
+
+	sim_bullet_joint_bool_start=5000,
+	/* if you add something here, search for bjb11032016 */
+	sim_bullet_joint_bool_end,
+
+	sim_bullet_body_float_start=6000,
+	sim_bullet_body_restitution,
+	sim_bullet_body_oldfriction,
+	sim_bullet_body_friction,
+	sim_bullet_body_lineardamping,
+	sim_bullet_body_angulardamping,
+	sim_bullet_body_nondefaultcollisionmargingfactor,
+	sim_bullet_body_nondefaultcollisionmargingfactorconvex,
+	sim_bullet_body_float_end,
+
+	sim_bullet_body_int_start=7000,
+	sim_bullet_body_bitcoded,
+	sim_bullet_body_int_end,
+
+	sim_bullet_body_bool_start=8000,
+	sim_bullet_body_sticky,
+	sim_bullet_body_usenondefaultcollisionmargin,
+	sim_bullet_body_usenondefaultcollisionmarginconvex,
+	sim_bullet_body_autoshrinkconvex,
+	sim_bullet_body_bool_end,
+
+	/* ODE */
+	sim_ode_global_float_start=9000,
+	sim_ode_global_stepsize,
+	sim_ode_global_internalscalingfactor,
+	sim_ode_global_cfm,
+	sim_ode_global_erp,
+	sim_ode_global_float_end,
+
+	sim_ode_global_int_start=10000,
+	sim_ode_global_constraintsolvingiterations,
+	sim_ode_global_bitcoded,
+	sim_ode_global_int_end,
+
+	sim_ode_global_bool_start=11000,
+	sim_ode_global_fullinternalscaling,
+	sim_ode_global_quickstep,
+	sim_ode_global_bool_end,
+
+	sim_ode_joint_float_start=12000,
+	sim_ode_joint_stoperp,
+	sim_ode_joint_stopcfm,
+	sim_ode_joint_bounce,
+	sim_ode_joint_fudgefactor,
+	sim_ode_joint_normalcfm,
+	sim_ode_joint_float_end,
+
+	sim_ode_joint_int_start=13000,
+	/* if you add something here, search for oji11032016 */
+	sim_ode_joint_int_end,
+
+	sim_ode_joint_bool_start=14000,
+	/* if you add something here, search for ojb11032016 */
+	sim_ode_joint_bool_end,
+
+	sim_ode_body_float_start=15000,
+	sim_ode_body_friction,
+	sim_ode_body_softerp,
+	sim_ode_body_softcfm,
+	sim_ode_body_lineardamping,
+	sim_ode_body_angulardamping,
+	sim_ode_body_float_end,
+
+	sim_ode_body_int_start=16000,
+	sim_ode_body_maxcontacts,
+	sim_ode_body_int_end,
+
+	sim_ode_body_bool_start=17000,
+	/* if you add something here, search for obb11032016 */
+	sim_ode_body_bool_end,
+
+	/* Vortex */
+	sim_vortex_global_float_start=18000,
+	sim_vortex_global_stepsize,
+	sim_vortex_global_internalscalingfactor,
+	sim_vortex_global_contacttolerance,
+	sim_vortex_global_constraintlinearcompliance,
+	sim_vortex_global_constraintlineardamping,
+	sim_vortex_global_constraintlinearkineticloss,
+	sim_vortex_global_constraintangularcompliance,
+	sim_vortex_global_constraintangulardamping,
+	sim_vortex_global_constraintangularkineticloss,
+	sim_vortex_global_float_end,
+
+	sim_vortex_global_int_start=19000,
+	sim_vortex_global_bitcoded,
+	sim_vortex_global_int_end,
+
+	sim_vortex_global_bool_start=20000,
+	sim_vortex_global_autosleep,
+	sim_vortex_global_multithreading,
+	sim_vortex_global_bool_end,
+
+	sim_vortex_joint_float_start=21000,
+	sim_vortex_joint_lowerlimitdamping,
+	sim_vortex_joint_upperlimitdamping,
+	sim_vortex_joint_lowerlimitstiffness,
+	sim_vortex_joint_upperlimitstiffness,
+	sim_vortex_joint_lowerlimitrestitution,
+	sim_vortex_joint_upperlimitrestitution,
+	sim_vortex_joint_lowerlimitmaxforce,
+	sim_vortex_joint_upperlimitmaxforce,
+	sim_vortex_joint_motorconstraintfrictioncoeff,
+	sim_vortex_joint_motorconstraintfrictionmaxforce,
+	sim_vortex_joint_motorconstraintfrictionloss,
+	sim_vortex_joint_p0loss,
+	sim_vortex_joint_p0stiffness,
+	sim_vortex_joint_p0damping,
+	sim_vortex_joint_p0frictioncoeff,
+	sim_vortex_joint_p0frictionmaxforce,
+	sim_vortex_joint_p0frictionloss,
+	sim_vortex_joint_p1loss,
+	sim_vortex_joint_p1stiffness,
+	sim_vortex_joint_p1damping,
+	sim_vortex_joint_p1frictioncoeff,
+	sim_vortex_joint_p1frictionmaxforce,
+	sim_vortex_joint_p1frictionloss,
+	sim_vortex_joint_p2loss,
+	sim_vortex_joint_p2stiffness,
+	sim_vortex_joint_p2damping,
+	sim_vortex_joint_p2frictioncoeff,
+	sim_vortex_joint_p2frictionmaxforce,
+	sim_vortex_joint_p2frictionloss,
+	sim_vortex_joint_a0loss,
+	sim_vortex_joint_a0stiffness,
+	sim_vortex_joint_a0damping,
+	sim_vortex_joint_a0frictioncoeff,
+	sim_vortex_joint_a0frictionmaxforce,
+	sim_vortex_joint_a0frictionloss,
+	sim_vortex_joint_a1loss,
+	sim_vortex_joint_a1stiffness,
+	sim_vortex_joint_a1damping,
+	sim_vortex_joint_a1frictioncoeff,
+	sim_vortex_joint_a1frictionmaxforce,
+	sim_vortex_joint_a1frictionloss,
+	sim_vortex_joint_a2loss,
+	sim_vortex_joint_a2stiffness,
+	sim_vortex_joint_a2damping,
+	sim_vortex_joint_a2frictioncoeff,
+	sim_vortex_joint_a2frictionmaxforce,
+	sim_vortex_joint_a2frictionloss,
+	sim_vortex_joint_dependencyfactor,
+	sim_vortex_joint_dependencyoffset,
+	sim_vortex_joint_float_end,
+
+	sim_vortex_joint_int_start=22000,
+	sim_vortex_joint_bitcoded,
+	sim_vortex_joint_relaxationenabledbc,
+	sim_vortex_joint_frictionenabledbc,
+	sim_vortex_joint_frictionproportionalbc,
+	sim_vortex_joint_objectid,
+	sim_vortex_joint_dependentobjectid,
+	sim_vortex_joint_int_end,
+
+	sim_vortex_joint_bool_start=23000,
+	sim_vortex_joint_motorfrictionenabled,
+	sim_vortex_joint_proportionalmotorfriction,
+	sim_vortex_joint_bool_end,
+
+	sim_vortex_body_float_start=24000,
+	sim_vortex_body_primlinearaxisfriction,
+	sim_vortex_body_seclinearaxisfriction,
+	sim_vortex_body_primangularaxisfriction,
+	sim_vortex_body_secangularaxisfriction,
+	sim_vortex_body_normalangularaxisfriction,
+	sim_vortex_body_primlinearaxisstaticfrictionscale,
+	sim_vortex_body_seclinearaxisstaticfrictionscale,
+	sim_vortex_body_primangularaxisstaticfrictionscale,
+	sim_vortex_body_secangularaxisstaticfrictionscale,
+	sim_vortex_body_normalangularaxisstaticfrictionscale,
+	sim_vortex_body_compliance,
+	sim_vortex_body_damping,
+	sim_vortex_body_restitution,
+	sim_vortex_body_restitutionthreshold,
+	sim_vortex_body_adhesiveforce,
+	sim_vortex_body_linearvelocitydamping,
+	sim_vortex_body_angularvelocitydamping,
+	sim_vortex_body_primlinearaxisslide,
+	sim_vortex_body_seclinearaxisslide,
+	sim_vortex_body_primangularaxisslide,
+	sim_vortex_body_secangularaxisslide,
+	sim_vortex_body_normalangularaxisslide,
+	sim_vortex_body_primlinearaxisslip,
+	sim_vortex_body_seclinearaxisslip,
+	sim_vortex_body_primangularaxisslip,
+	sim_vortex_body_secangularaxisslip,
+	sim_vortex_body_normalangularaxisslip,
+	sim_vortex_body_autosleeplinearspeedthreshold,
+	sim_vortex_body_autosleeplinearaccelthreshold,
+	sim_vortex_body_autosleepangularspeedthreshold,
+	sim_vortex_body_autosleepangularaccelthreshold,
+	sim_vortex_body_skinthickness,
+	sim_vortex_body_autoangulardampingtensionratio,
+	sim_vortex_body_primaxisvectorx,
+	sim_vortex_body_primaxisvectory,
+	sim_vortex_body_primaxisvectorz,
+	sim_vortex_body_float_end,
+
+	sim_vortex_body_int_start=25000,
+	sim_vortex_body_primlinearaxisfrictionmodel,
+	sim_vortex_body_seclinearaxisfrictionmodel,
+	sim_vortex_body_primangulararaxisfrictionmodel,
+	sim_vortex_body_secmangulararaxisfrictionmodel,
+	sim_vortex_body_normalmangulararaxisfrictionmodel,
+	sim_vortex_body_bitcoded,
+	sim_vortex_body_autosleepsteplivethreshold,
+	sim_vortex_body_materialuniqueid,
+	sim_vortex_body_int_end,
+
+	sim_vortex_body_bool_start=26000,
+	sim_vortex_body_pureshapesasconvex,
+	sim_vortex_body_convexshapesasrandom,
+	sim_vortex_body_randomshapesasterrain,
+	sim_vortex_body_fastmoving,
+	sim_vortex_body_autoslip,
+	sim_vortex_body_seclinaxissameasprimlinaxis,
+	sim_vortex_body_secangaxissameasprimangaxis,
+	sim_vortex_body_normangaxissameasprimangaxis,
+	sim_vortex_body_autoangulardamping,
+	sim_vortex_body_bool_end,
+
+	/* Newton */
+	sim_newton_global_float_start=27000,
+	sim_newton_global_stepsize,
+	sim_newton_global_contactmergetolerance,
+	sim_newton_global_float_end,
+
+	sim_newton_global_int_start=28000,
+	sim_newton_global_constraintsolvingiterations,
+	sim_newton_global_bitcoded,
+	sim_newton_global_int_end,
+
+	sim_newton_global_bool_start=29000,
+	sim_newton_global_multithreading,
+	sim_newton_global_exactsolver,
+	sim_newton_global_highjointaccuracy,
+	sim_newton_global_bool_end,
+
+	sim_newton_joint_float_start=30000,
+	sim_newton_joint_dependencyfactor,
+	sim_newton_joint_dependencyoffset,
+	sim_newton_joint_float_end,
+
+	sim_newton_joint_int_start=31000,
+	sim_newton_joint_objectid,
+	sim_newton_joint_dependentobjectid,
+	sim_newton_joint_int_end,
+
+	sim_newton_joint_bool_start=32000,
+	/* if you add something here, search for njb11032016 */
+	sim_newton_joint_bool_end,
+
+	sim_newton_body_float_start=33000,
+	sim_newton_body_staticfriction,
+	sim_newton_body_kineticfriction,
+	sim_newton_body_restitution,
+	sim_newton_body_lineardrag,
+	sim_newton_body_angulardrag,
+	sim_newton_body_float_end,
+
+	sim_newton_body_int_start=34000,
+	sim_newton_body_bitcoded,
+	sim_newton_body_int_end,
+
+	sim_newton_body_bool_start=35000,
+	sim_newton_body_fastmoving,
+	sim_newton_body_bool_end
+};
+
+enum { /* Vortex friction models */
+	sim_vortex_bodyfrictionmodel_box=0,
+	sim_vortex_bodyfrictionmodel_scaledbox,
+	sim_vortex_bodyfrictionmodel_proplow,
+	sim_vortex_bodyfrictionmodel_prophigh,
+	sim_vortex_bodyfrictionmodel_scaledboxfast,
+	sim_vortex_bodyfrictionmodel_neutral,
+	sim_vortex_bodyfrictionmodel_none
+};
+
+enum { /* Bullet constraint solver type */
+	sim_bullet_constraintsolvertype_sequentialimpulse=0,
+	sim_bullet_constraintsolvertype_nncg,
+	sim_bullet_constraintsolvertype_dantzig,
+	sim_bullet_constraintsolvertype_projectedgaussseidel
+};
+
+enum {
+	sim_objdynprop_dynamic=1,
+	sim_objdynprop_respondable=2,
+};
+
+enum {
+	sim_announce_pureconenotsupported=0,
+	sim_announce_purespheroidnotsupported,
+	sim_announce_containsnonpurenonconvexshapes,
+	sim_announce_containsstaticshapesondynamicconstruction,
+	sim_announce_purehollowshapenotsupported,
+	sim_announce_vortexpluginisdemo,
+	sim_announce_newtondynamicrandommeshnotsupported
+};
+
+enum {
+	sim_dynamicsimicon_none=0,
+	sim_dynamicsimicon_objectisdynamicallysimulated,
+	sim_dynamicsimicon_objectisnotdynamicallyenabled
+};
+
 /******************************************
 *******************************************
 Remote API constants:
 *******************************************
 *******************************************/
 
-#define SIMX_VERSION 10  /* max is 255!!! */
+#define SIMX_VERSION 11  /* max is 255!!! */
 /* version to 6 for release 3.1.2 */
 /* version to 7 for release 3.1.3 */
 /* version to 8 for release AFTER 3.1.3 */
 /* version to 10 for release AFTER 3.2.3. Added simxGetCollectionHandle and simxCallScriptFunction */
+/* version to 11 for release AFTER 3.3.0. Added uses stacks for data exchange with scripts */
 
 /*
 Messages sent/received look like this:

@@ -24,7 +24,7 @@
 // along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
+// This file was automatically created for V-REP release V3.3.1 Rev1 on May 17th 2016
 
 #include "extApiPlatform.h"
 #include <stdio.h>
@@ -240,6 +240,20 @@ simxUChar* extApi_readFile(const simxChar* fileName,simxInt* len)
 		fclose(file);
 		len[0]=fileLength;
 	}
+	return(retVal);
+}
+
+simxFloat extApi_getFloatFromPtr(const simxUChar* ptr)
+{ /* To avoid BUS ERROR on some processors, when the data is not properly aligned (thanks to Scott Hissam) */
+	simxFloat retVal;
+	memcpy (&retVal,ptr,sizeof(simxFloat));
+	return(retVal);
+}
+
+simxInt extApi_getIntFromPtr(const simxUChar* ptr)
+{ /* To avoid BUS ERROR on some processors, when the data is not properly aligned (thanks to Scott Hissam) */
+	simxInt retVal;
+	memcpy (&retVal,ptr,sizeof(simxInt));
 	return(retVal);
 }
 

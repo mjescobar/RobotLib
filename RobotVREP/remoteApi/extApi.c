@@ -24,7 +24,7 @@
 // along with the REMOTE API.  If not, see <http://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------
 //
-// This file was automatically created for V-REP release V3.3.0 on February 19th 2016
+// This file was automatically created for V-REP release V3.3.1 Rev1 on May 17th 2016
 
 #include "extApi.h"
 #include "extApiInternal.h"
@@ -1109,7 +1109,7 @@ simxFloat _readPureDataFloat(simxUChar* commandPointer,simxInt stringCnt,simxInt
 			stringCnt--;
 		}
 		additionalOffset+=byteOffset;
-		retVal=extApi_endianConversionFloat(((simxFloat*)(commandPointer+SIMX_SUBHEADER_SIZE+additionalOffset))[0]);
+        retVal=extApi_endianConversionFloat(extApi_getFloatFromPtr(commandPointer+SIMX_SUBHEADER_SIZE+additionalOffset));
 	}
 	return(retVal);
 }
@@ -1145,7 +1145,7 @@ simxInt _readPureDataInt(simxUChar* commandPointer,simxInt stringCnt,simxInt byt
 			stringCnt--;
 		}
 		additionalOffset+=byteOffset;
-		retVal=extApi_endianConversionInt(((simxInt*)(commandPointer+SIMX_SUBHEADER_SIZE+additionalOffset))[0]);
+        retVal=extApi_endianConversionInt(extApi_getIntFromPtr(commandPointer+SIMX_SUBHEADER_SIZE+additionalOffset));
 	}
 	return(retVal);
 }
@@ -1156,12 +1156,12 @@ simxUChar* _getCommandPointer_(simxInt cmdRaw,const simxUChar* commandBufferStar
 	simxInt offset=0;
 	while (offset<commandBufferSize)
 	{
-		if ((extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_cmd))[0])&simx_cmdmask)==cmdRaw)
+		if ((extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_cmd))&simx_cmdmask)==cmdRaw)
 		{
 			retVal=(simxUChar*)(commandBufferStart+offset);
 			break;
 		}
-		offset+=extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_mem_size))[0]);
+		offset+=extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_mem_size));
 	}
 	return(retVal);
 }
@@ -1172,15 +1172,15 @@ simxUChar* _getCommandPointer_i(simxInt cmdRaw,simxInt intValue,const simxUChar*
 	simxInt offset=0;
 	while (offset<commandBufferSize)
 	{
-		if ((extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_cmd))[0])&simx_cmdmask)==cmdRaw)
+		if ((extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_cmd))&simx_cmdmask)==cmdRaw)
 		{
-			if (((simxInt*)(commandBufferStart+offset+SIMX_SUBHEADER_SIZE))[0]==extApi_endianConversionInt(intValue))
+			if (extApi_getIntFromPtr(commandBufferStart+offset+SIMX_SUBHEADER_SIZE)==extApi_endianConversionInt(intValue))
 			{
 				retVal=(simxUChar*)(commandBufferStart+offset);
 				break;
 			}
 		}
-		offset+=extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_mem_size))[0]);
+		offset+=extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_mem_size));
 	}
 	return(retVal);
 }
@@ -1191,18 +1191,18 @@ simxUChar* _getCommandPointer_ii(simxInt cmdRaw,simxInt intValue1,simxInt intVal
 	simxInt offset=0;
 	while (offset<commandBufferSize)
 	{
-		if ((extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_cmd))[0])&simx_cmdmask)==cmdRaw)
+		if ((extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_cmd))&simx_cmdmask)==cmdRaw)
 		{
-			if (((simxInt*)(commandBufferStart+offset+SIMX_SUBHEADER_SIZE))[0]==extApi_endianConversionInt(intValue1))
+			if (extApi_getIntFromPtr(commandBufferStart+offset+SIMX_SUBHEADER_SIZE)==extApi_endianConversionInt(intValue1))
 			{
-				if (((simxInt*)(commandBufferStart+offset+SIMX_SUBHEADER_SIZE))[1]==extApi_endianConversionInt(intValue2))
+				if (extApi_getIntFromPtr(commandBufferStart+offset+SIMX_SUBHEADER_SIZE+sizeof(simxInt))==extApi_endianConversionInt(intValue2))
 				{
 					retVal=(simxUChar*)(commandBufferStart+offset);
 					break;
 				}
 			}
 		}
-		offset+=extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_mem_size))[0]);
+		offset+=extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_mem_size));
 	}
 	return(retVal);
 }
@@ -1213,7 +1213,7 @@ simxUChar* _getCommandPointer_s(simxInt cmdRaw,const simxUChar* stringValue,cons
 	simxInt offset=0;
 	while (offset<commandBufferSize)
 	{
-		if ((extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_cmd))[0])&simx_cmdmask)==cmdRaw)
+		if ((extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_cmd))&simx_cmdmask)==cmdRaw)
 		{
 			if (extApi_areStringsSame((simxChar*)stringValue,(simxChar*)commandBufferStart+offset+SIMX_SUBHEADER_SIZE)!=0)
 			{
@@ -1232,9 +1232,9 @@ simxUChar* _getCommandPointer_iss(simxInt cmdRaw,simxInt intValue,const simxUCha
 	simxInt offset=0;
 	while (offset<commandBufferSize)
 	{
-		if ((extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_cmd))[0])&simx_cmdmask)==cmdRaw)
+		if ((extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_cmd))&simx_cmdmask)==cmdRaw)
 		{
-			if (((simxInt*)(commandBufferStart+offset+SIMX_SUBHEADER_SIZE))[0]==extApi_endianConversionInt(intValue))
+			if (extApi_getIntFromPtr(commandBufferStart+offset+SIMX_SUBHEADER_SIZE)==extApi_endianConversionInt(intValue))
 			{
 				if (extApi_areStringsSame((simxChar*)stringValue1,(simxChar*)commandBufferStart+offset+SIMX_SUBHEADER_SIZE+sizeof(simxInt))!=0)
 				{
@@ -1246,7 +1246,7 @@ simxUChar* _getCommandPointer_iss(simxInt cmdRaw,simxInt intValue,const simxUCha
 				}
 			}
 		}
-		offset+=extApi_endianConversionInt(((simxInt*)(commandBufferStart+offset+simx_cmdheaderoffset_mem_size))[0]);
+		offset+=extApi_endianConversionInt(extApi_getIntFromPtr(commandBufferStart+offset+simx_cmdheaderoffset_mem_size));
 	}
 	return(retVal);
 }

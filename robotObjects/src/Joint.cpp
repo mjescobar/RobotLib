@@ -31,14 +31,15 @@ double Joint::RADtoSCALE(double value)
 	return 2.0*(value - min_value)/(max_value - min_value) - 1.0;
 }
 
-Joint::Joint(const char name[], double max_value, double min_value, double initial_position, const char * unit) : Object(name)
+Joint::Joint(const char * unit, const char name[], double max_value, double min_value, double initial_position) : Object(name)
 {
 	positions = new double[3];
 
 	this->max_value = max_value;
 	this->min_value = min_value;
 	this->initial_position = initial_position;
-
+	positions[0] = initial_position;
+	
 	pass_slope_sign = 1;
 	next_slope_sign = 1;
 	joint_change_direction = false;
@@ -84,11 +85,11 @@ void Joint::setJointNextPosition(double position)
 
 	if (position > max_value)
 	{
-		positions[0] = truncValue((this->*convertToRadFrom)(max_value),PRECISION);
+		positions[0] = truncValue(max_value, PRECISION);
 	}
 	else if (position < min_value)
 	{
-		positions[0] = truncValue((this->*convertToRadFrom)(min_value),PRECISION);
+		positions[0] = truncValue(min_value, PRECISION);
 	}
 	else
 	{
